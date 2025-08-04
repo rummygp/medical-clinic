@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -21,36 +22,25 @@ public class PatientRepository {
                 .findFirst();
     }
 
-    public boolean add(Patient patient) {
-        if (findByEmail(patient.getEmail()).isPresent()) {
-            return false;
-        }
+    public Patient add(Patient patient) {
         patients.add(patient);
-        return true;
+        return patient;
     }
 
     public boolean remove(String email) {
         return patients.removeIf(patient -> patient.getEmail().equals(email));
     }
 
-    public boolean edit(String email, Patient updated) {
-        var optional = findByEmail(email);
-        if (optional.isEmpty()) return false;
-
-        if (!email.equals(updated.getEmail()) && findByEmail(updated.getEmail()).isPresent()) {
-            return false;
-        }
-
-        Patient current = optional.get();
-
-        current.setFirstName(updated.getFirstName());
-        current.setLastName(updated.getLastName());
-        current.setEmail(updated.getEmail());
-        current.setPhoneNumber(updated.getPhoneNumber());
-        current.setBirthday(updated.getBirthday());
-        current.setIdCardNo(updated.getIdCardNo());
-        current.setPassword(updated.getPassword());
-
-        return true;
+    public Patient edit(String email, Patient updatedPatient) {
+        findByEmail(email).ifPresent(patient -> {
+            patient.setFirstName(updatedPatient.getFirstName());
+            patient.setLastName(updatedPatient.getLastName());
+            patient.setEmail(updatedPatient.getEmail());
+            patient.setPhoneNumber(updatedPatient.getPhoneNumber());
+            patient.setBirthday(updatedPatient.getBirthday());
+            patient.setIdCardNo(updatedPatient.getIdCardNo());
+            patient.setPassword(updatedPatient.getPassword());
+                });
+                return updatedPatient;
     }
 }

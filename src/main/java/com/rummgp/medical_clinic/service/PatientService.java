@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Service
@@ -22,11 +23,11 @@ public class PatientService {
                 .orElseThrow(() -> new IllegalArgumentException("Nie ma takiego pacjenta"));
     }
 
-    public void addPatient(Patient patient) {
-        boolean added = patientRepository.add(patient);
-        if (!added) {
-            throw new IllegalArgumentException("Email: " + patient.getEmail() + " jest już zajęty");
+    public Patient addPatient(Patient patient) {
+        if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Pacjent o emailu: " + patient.getEmail() + " już istnieje");
         }
+        return patientRepository.add(patient);
     }
 
     public void removePatient(String email) {
@@ -36,14 +37,11 @@ public class PatientService {
         }
     }
 
-    public void editPatient(String email, Patient updatedpatient) {
-        boolean edited = patientRepository.edit(email, updatedpatient);
-        if (!edited) {
-            if (patientRepository.findByEmail(email).isEmpty()) {
-                throw new IllegalArgumentException("Nie ma pacjenta z emailem: " + email);
-            } else {
-                throw new IllegalArgumentException("Email: " + email + " jest już zajęty");
-            }
+    public Patient editPatient(String email, Patient updatedpatient) {
+        if (patientRepository.findByEmail(email).isEmpty() ||
+                (!email.equals(updatedpatient.getEmail()) && patientRepository.findByEmail(updatedpatient.getEmail()).isPresent())) {
+                    throw new NoSuchElementException("Nieprawidłowe dane wprowadzonego użytkownika");
         }
+        return patientRepository.edit(email, updatedpatient);
     }
 }
