@@ -34,14 +34,14 @@ public class PatientRepository {
     }
 
     public boolean edit(String email, Patient updated) {
-        var opt = findByEmail(email);
-        if (opt.isEmpty()) return false;
+        var optional = findByEmail(email);
+        if (optional.isEmpty()) return false;
 
         if (!email.equals(updated.getEmail()) && findByEmail(updated.getEmail()).isPresent()) {
             return false;
         }
 
-        Patient current = opt.get();
+        Patient current = optional.get();
 
         current.setFirstName(updated.getFirstName());
         current.setLastName(updated.getLastName());
