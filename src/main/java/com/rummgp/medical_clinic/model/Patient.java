@@ -1,4 +1,4 @@
-package com.rummgp.medical_clinic;
+package com.rummgp.medical_clinic.model;
 
 import lombok.*;
 
@@ -12,9 +12,9 @@ import java.time.LocalDate;
 public class Patient {
     private String email;
     private String password;
-    private int idCardNo;
+    private String idCardNo;
     private String firstName;
     private String lastName;
-    private int phoneNumber;
+    private String phoneNumber;
     private LocalDate birthday;
 }
