@@ -33,17 +33,24 @@ public class PatientRepository {
         return patients.removeIf(patient -> patient.getEmail().equals(email));
     }
 
-    public boolean edit(String email, Patient updatedPatient) {
-        for (int i = 0; i < patients.size(); i++) {
-            Patient currentPatient = patients.get(i);
-            if (currentPatient.getEmail().equals(email)) {
-                if (!email.equals(updatedPatient.getEmail()) && findByEmail(updatedPatient.getEmail()).isPresent()) {
-                    return false;
-                }
-                patients.set(i, updatedPatient);
-                return true;
-            }
+    public boolean edit(String email, Patient updated) {
+        var opt = findByEmail(email);
+        if (opt.isEmpty()) return false;
+
+        if (!email.equals(updated.getEmail()) && findByEmail(updated.getEmail()).isPresent()) {
+            return false;
         }
-        return false;
+
+        Patient current = opt.get();
+
+        current.setFirstName(updated.getFirstName());
+        current.setLastName(updated.getLastName());
+        current.setEmail(updated.getEmail());
+        current.setPhoneNumber(updated.getPhoneNumber());
+        current.setBirthday(updated.getBirthday());
+        current.setIdCardNo(updated.getIdCardNo());
+        current.setPassword(updated.getPassword());
+
+        return true;
     }
 }
