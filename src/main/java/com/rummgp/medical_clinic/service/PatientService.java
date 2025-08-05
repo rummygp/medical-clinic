@@ -31,17 +31,24 @@ public class PatientService {
     }
 
     public void removePatient(String email) {
-        boolean removed = patientRepository.remove(email);
-        if (!removed) {
-            throw new IllegalArgumentException("Nie ma pacjenta z emailem: " + email);
+        if (!patientRepository.remove(email)) {
+            throw new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje.");
         }
     }
 
     public Patient editPatient(String email, Patient updatedpatient) {
-        if (patientRepository.findByEmail(email).isEmpty() ||
-                (!email.equals(updatedpatient.getEmail()) && patientRepository.findByEmail(updatedpatient.getEmail()).isPresent())) {
-                    throw new NoSuchElementException("Nieprawidłowe dane wprowadzonego użytkownika");
+        Patient patient = patientRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje."));
+        if ((!email.equals(updatedpatient.getEmail()) && patientRepository.findByEmail(updatedpatient.getEmail()).isPresent())) {
+                    throw new IllegalArgumentException("Nieprawidłowe dane wprowadzonego użytkownika");
         }
-        return patientRepository.edit(email, updatedpatient);
+        return patientRepository.edit(patient, updatedpatient);
+    }
+
+    public Patient changePassword (String email, String password) {
+        Patient patient = patientRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje."));
+        patient.setPassword(password);
+        return patientRepository.edit(patient, patient);
     }
 }

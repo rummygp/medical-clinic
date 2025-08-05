@@ -1,5 +1,6 @@
 package com.rummgp.medical_clinic.controller;
 
+import com.rummgp.medical_clinic.command.ChangePasswordCommand;
 import com.rummgp.medical_clinic.model.Patient;
 import com.rummgp.medical_clinic.service.PatientService;
 import lombok.RequiredArgsConstructor;
@@ -39,5 +40,10 @@ public class PatientController {
     @PutMapping("/{email}")
     public Patient editPatient(@PathVariable String email, @RequestBody Patient patient) {
         return patientService.editPatient(email, patient);
+    }
+
+    @PatchMapping("/email")
+    public Patient changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand password) {
+        return patientService.changePassword(email, password.getPassword());
     }
 }

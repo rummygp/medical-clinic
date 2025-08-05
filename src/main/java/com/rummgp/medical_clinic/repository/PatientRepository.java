@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -31,16 +30,7 @@ public class PatientRepository {
         return patients.removeIf(patient -> patient.getEmail().equals(email));
     }
 
-    public Patient edit(String email, Patient updatedPatient) {
-        findByEmail(email).ifPresent(patient -> {
-            patient.setFirstName(updatedPatient.getFirstName());
-            patient.setLastName(updatedPatient.getLastName());
-            patient.setEmail(updatedPatient.getEmail());
-            patient.setPhoneNumber(updatedPatient.getPhoneNumber());
-            patient.setBirthday(updatedPatient.getBirthday());
-            patient.setIdCardNo(updatedPatient.getIdCardNo());
-            patient.setPassword(updatedPatient.getPassword());
-                });
-                return updatedPatient;
+    public Patient edit(Patient patient, Patient updatedPatient) {
+        return patient.edit(updatedPatient);
     }
 }
