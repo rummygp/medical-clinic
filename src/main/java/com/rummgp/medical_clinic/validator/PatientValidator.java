@@ -40,7 +40,9 @@ public final class PatientValidator {
             }
         }
 
-        public static void validatePasswordEdit(Patient patient){
-
+        public static void validatePasswordEdit(String password){
+            if (password == null) {
+                throw new IllegalArgumentException("Fields should not be null");
+            }
         }
 }
