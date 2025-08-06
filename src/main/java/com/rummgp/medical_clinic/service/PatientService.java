@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +25,15 @@ public class PatientService {
     }
 
     public Patient addPatient(Patient patient) {
+        if (patient.getFirstName() == null ||
+                patient.getLastName() == null||
+                patient.getEmail() == null ||
+                patient.getPassword() == null ||
+                patient.getIdCardNo() == null ||
+                patient.getPhoneNumber() == null ||
+                patient.getBirthday() == null) {
+            throw new IllegalArgumentException("Fields should not be null");
+        }
         if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Pacjent o emailu: " + patient.getEmail() + " już istnieje");
         }
@@ -37,15 +47,30 @@ public class PatientService {
     }
 
     public Patient editPatient(String email, Patient updatedpatient) {
+        if (updatedpatient.getFirstName() == null ||
+                updatedpatient.getLastName() == null||
+                updatedpatient.getEmail() == null ||
+                updatedpatient.getPassword() == null ||
+                updatedpatient.getIdCardNo() == null ||
+                updatedpatient.getPhoneNumber() == null ||
+                updatedpatient.getBirthday() == null) {
+            throw new IllegalArgumentException("Fields should not be null");
+        }
         Patient patient = patientRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje."));
+        if (!patient.getIdCardNo().equals(updatedpatient.getIdCardNo())) {
+            throw new IllegalArgumentException("Id Card number can't be changed");
+        }
         if ((!email.equals(updatedpatient.getEmail()) && patientRepository.findByEmail(updatedpatient.getEmail()).isPresent())) {
-                    throw new IllegalArgumentException("Nieprawidłowe dane wprowadzonego użytkownika");
+            throw new IllegalArgumentException("Nieprawidłowe dane wprowadzonego użytkownika");
         }
         return patientRepository.edit(patient, updatedpatient);
     }
 
     public Patient changePassword (String email, String password) {
+        if (password == null) {
+            throw new IllegalArgumentException("Fields should not be null");
+        }
         Patient patient = patientRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje."));
         patient.setPassword(password);
