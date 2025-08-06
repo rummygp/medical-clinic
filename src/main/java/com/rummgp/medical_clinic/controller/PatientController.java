@@ -42,7 +42,7 @@ public class PatientController {
         return patientService.editPatient(email, patient);
     }
 
-    @PatchMapping("/email")
+    @PatchMapping("/{email}")
     public Patient changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand password) {
         return patientService.changePassword(email, password.getPassword());
     }
