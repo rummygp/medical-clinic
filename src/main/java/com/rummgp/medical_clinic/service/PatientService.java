@@ -1,5 +1,6 @@
 package com.rummgp.medical_clinic.service;
 
+import com.rummgp.medical_clinic.exception.PatientNotFoundException;
 import com.rummgp.medical_clinic.model.Patient;
 import com.rummgp.medical_clinic.repository.PatientRepository;
 import com.rummgp.medical_clinic.validator.PatientValidator;
@@ -7,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Service
@@ -21,7 +21,7 @@ public class PatientService {
 
     public Patient getPatient(String email) {
         return patientRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Nie ma takiego pacjenta"));
+                .orElseThrow(() -> new PatientNotFoundException(email));
     }
 
     public Patient addPatient(Patient patient) {
@@ -31,13 +31,13 @@ public class PatientService {
 
     public void removePatient(String email) {
         if (!patientRepository.remove(email)) {
-            throw new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje.");
+            throw new PatientNotFoundException(email);
         }
     }
 
     public Patient editPatient(String email, Patient updatedpatient) {
         Patient patient = patientRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje."));
+                .orElseThrow(() -> new PatientNotFoundException(email));
         PatientValidator.validatePatientEdit(patient, updatedpatient, patientRepository);
         return patientRepository.edit(patient, updatedpatient);
     }
@@ -45,7 +45,7 @@ public class PatientService {
     public Patient changePassword (String email, String password) {
         PatientValidator.validatePasswordEdit(password);
         Patient patient = patientRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("Pacjet o emailu: " + email + " nie istnieje."));
+                .orElseThrow(() -> new PatientNotFoundException(email));
         patient.setPassword(password);
         return patientRepository.edit(patient, patient);
     }

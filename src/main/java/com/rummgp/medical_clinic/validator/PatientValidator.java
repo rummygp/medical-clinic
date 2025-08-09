@@ -1,5 +1,6 @@
 package com.rummgp.medical_clinic.validator;
 
+import com.rummgp.medical_clinic.exception.EmailAlreadyExistsException;
 import com.rummgp.medical_clinic.model.Patient;
 import com.rummgp.medical_clinic.repository.PatientRepository;
 import lombok.AccessLevel;
@@ -18,7 +19,7 @@ public final class PatientValidator {
                 throw new IllegalArgumentException("Fields should not be null");
             }
             if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
-                throw new IllegalArgumentException("Pacjent o emailu: " + patient.getEmail() + " już istnieje");
+                throw new EmailAlreadyExistsException(patient.getEmail());
             }
         }
 
@@ -36,7 +37,7 @@ public final class PatientValidator {
                 throw new IllegalArgumentException("Id Card number can't be changed");
             }
             if ((!patient.getEmail().equals(updatedpatient.getEmail()) && patientRepository.findByEmail(updatedpatient.getEmail()).isPresent())) {
-                throw new IllegalArgumentException("Nieprawidłowe dane wprowadzonego użytkownika");
+                throw new EmailAlreadyExistsException(updatedpatient.getEmail());
             }
         }
 
