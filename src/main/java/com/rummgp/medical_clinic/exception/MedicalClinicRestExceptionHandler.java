@@ -1,8 +1,10 @@
 package com.rummgp.medical_clinic.exception;
 
 import com.rummgp.medical_clinic.dto.ErrorMessageDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDate;
@@ -23,14 +25,13 @@ public class MedicalClinicRestExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    protected ResponseEntity<ErrorMessageDto> handleGlobalException(Exception ex) {
-        return ResponseEntity.status(500).body(
-                ErrorMessageDto.builder()
-                        .createdAt(LocalDate.now())
-                        .message(ex.getMessage())
-                        .error("Unknown Error")
-                        .status(500)
-                        .build()
-        );
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    protected ErrorMessageDto handleGlobalException(Exception ex) {
+        return ErrorMessageDto.builder()
+                .createdAt(LocalDate.now())
+                .message(ex.getMessage())
+                .error("Unknown Error")
+                .status(500)
+                .build();
     }
 }
