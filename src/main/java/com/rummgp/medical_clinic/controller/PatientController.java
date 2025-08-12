@@ -17,23 +17,24 @@ import java.util.stream.Collectors;
 @RequestMapping("/patients")
 public class PatientController {
     private final PatientService patientService;
+    private final PatientMapper patientMapper;
 
     @GetMapping
     public List<PatientDto> getPatients() {
         return patientService.getAll().stream()
-                .map(PatientMapper::toDto)
+                .map(patientMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{email}")
     public PatientDto getPatientByEmail(@PathVariable String email) {
-        return PatientMapper.toDto(patientService.getPatient(email));
+        return patientMapper.toDto(patientService.getPatient(email));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PatientDto addPatient(@RequestBody Patient patient) {
-       return PatientMapper.toDto(patientService.addPatient(patient));
+       return patientMapper.toDto(patientService.addPatient(patient));
     }
 
     @DeleteMapping("/{email}")
@@ -44,11 +45,11 @@ public class PatientController {
 
     @PutMapping("/{email}")
     public PatientDto editPatient(@PathVariable String email, @RequestBody Patient patient) {
-        return PatientMapper.toDto(patientService.editPatient(email, patient));
+        return patientMapper.toDto(patientService.editPatient(email, patient));
     }
 
     @PatchMapping("/{email}")
     public PatientDto changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand password) {
-        return PatientMapper.toDto(patientService.changePassword(email, password.getPassword()));
+        return patientMapper.toDto(patientService.changePassword(email, password.getPassword()));
     }
 }
