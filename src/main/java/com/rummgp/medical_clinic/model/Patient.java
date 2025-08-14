@@ -1,5 +1,6 @@
 package com.rummgp.medical_clinic.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -9,12 +10,18 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Entity
 public class Patient {
-    private String email;
-    private String password;
-    private String idCardNo;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String firstName;
     private String lastName;
+    @Column(unique = true)
+    private String email;
+    private String password;
+    @Column(name = "CARD_NUMBER_ID", unique = true)
+    private String idCardNo;
     private String phoneNumber;
     private LocalDate birthday;
 
@@ -26,6 +33,6 @@ public class Patient {
         this.lastName = newData.getLastName();
         this.phoneNumber = newData.getPhoneNumber();
         this.birthday = newData.getBirthday();
-        return newData;
+        return this;
     }
 }
