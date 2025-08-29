@@ -19,20 +19,20 @@ public class Patient {
     private String lastName;
     @Column(unique = true)
     private String email;
-    private String password;
     @Column(name = "CARD_NUMBER_ID", unique = true)
     private String idCardNo;
     private String phoneNumber;
     private LocalDate birthday;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
-    public Patient edit(Patient newData) {
+    public void edit(Patient newData) {
         this.email = newData.getEmail();
-        this.password = newData.getPassword();
         this.idCardNo = newData.getIdCardNo();
         this.firstName = newData.getFirstName();
         this.lastName = newData.getLastName();
         this.phoneNumber = newData.getPhoneNumber();
         this.birthday = newData.getBirthday();
-        return this;
     }
 }

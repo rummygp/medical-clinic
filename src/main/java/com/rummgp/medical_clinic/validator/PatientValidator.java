@@ -12,7 +12,6 @@ public final class PatientValidator {
             if (patient.getFirstName() == null ||
                     patient.getLastName() == null||
                     patient.getEmail() == null ||
-                    patient.getPassword() == null ||
                     patient.getIdCardNo() == null ||
                     patient.getPhoneNumber() == null ||
                     patient.getBirthday() == null) {
@@ -27,7 +26,6 @@ public final class PatientValidator {
             if (updatedpatient.getFirstName() == null ||
                     updatedpatient.getLastName() == null||
                     updatedpatient.getEmail() == null ||
-                    updatedpatient.getPassword() == null ||
                     updatedpatient.getIdCardNo() == null ||
                     updatedpatient.getPhoneNumber() == null ||
                     updatedpatient.getBirthday() == null) {
@@ -38,12 +36,6 @@ public final class PatientValidator {
             }
             if ((!patient.getEmail().equals(updatedpatient.getEmail()) && patientRepository.findByEmail(updatedpatient.getEmail()).isPresent())) {
                 throw new EmailAlreadyExistsException(updatedpatient.getEmail());
-            }
-        }
-
-        public static void validatePasswordEdit(String password){
-            if (password == null) {
-                throw new IllegalArgumentException("Fields should not be null");
             }
         }
 }

@@ -39,14 +39,7 @@ public class PatientService {
         Patient patient = patientRepository.findByEmail(email)
                 .orElseThrow(() -> new PatientNotFoundException(email));
         PatientValidator.validatePatientEdit(patient, updatedpatient, patientRepository);
-        return patientRepository.save(patient.edit(updatedpatient));
-    }
-
-    public Patient changePassword (String email, String password) {
-        PatientValidator.validatePasswordEdit(password);
-        Patient patient = patientRepository.findByEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
-        patient.setPassword(password);
+        patient.edit(updatedpatient);
         return patientRepository.save(patient);
     }
 }
