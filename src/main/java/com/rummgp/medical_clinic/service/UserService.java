@@ -25,7 +25,7 @@ public class UserService {
     }
 
     public User addUser(User user) {
-        UserValidator.validateUserCreate(user);
+        UserValidator.validateUserCreate(user, userRepository);
         return userRepository.save(user);
     }
 
