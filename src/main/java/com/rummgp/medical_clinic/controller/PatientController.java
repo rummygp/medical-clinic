@@ -42,7 +42,7 @@ public class PatientController {
                 .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Get patient by email")
+    @Operation(summary = "Get patient by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Patient returned.",
                     content = {@Content(mediaType = "application/json",
@@ -53,9 +53,9 @@ public class PatientController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
-    @GetMapping("/{email}")
-    public PatientDto getPatientByEmail(@PathVariable String email) {
-        return patientMapper.toDto(patientService.getPatient(email));
+    @GetMapping("/{id}")
+    public PatientDto getPatientByEmail(@PathVariable Long id) {
+        return patientMapper.toDto(patientService.getPatient(id));
     }
 
     @Operation(summary = "Add patient")
@@ -63,9 +63,6 @@ public class PatientController {
             @ApiResponse(responseCode = "201", description = "Patient has been created.",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = PatientDto.class))}),
-            @ApiResponse(responseCode = "409", description = "Email already exists",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Fields should not be null",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
@@ -78,7 +75,7 @@ public class PatientController {
         return patientMapper.toDto(patientService.addPatient(patientMapper.toEntity(patient)));
     }
 
-    @Operation(summary = "Delete patient by email")
+    @Operation(summary = "Delete patient by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Patient has been deleted.",
                     content = {@Content(mediaType = "application/json",
@@ -89,21 +86,18 @@ public class PatientController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
-    @DeleteMapping("/{email}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removePatientByEmail(@PathVariable String email) {
-        patientService.removePatient(email);
+    public void removePatientById(@PathVariable Long id) {
+        patientService.removePatient(id);
     }
 
-    @Operation(summary = "Edit patient using email")
+    @Operation(summary = "Edit patient using id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Patient has been edited successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = PatientDto.class))}),
             @ApiResponse(responseCode = "404", description = "Patient not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "409", description = "Email already exists",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Fields should not be null",
@@ -115,8 +109,8 @@ public class PatientController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
-    @PutMapping("/{email}")
-    public PatientDto editPatient(@PathVariable String email, @RequestBody PatientCreateCommand patient) {
-        return patientMapper.toDto(patientService.editPatient(email, patientMapper.toEntity(patient)));
+    @PutMapping("/{id}")
+    public PatientDto editPatient(@PathVariable Long id, @RequestBody PatientCreateCommand patient) {
+        return patientMapper.toDto(patientService.editPatient(id, patientMapper.toEntity(patient)));
     }
 }

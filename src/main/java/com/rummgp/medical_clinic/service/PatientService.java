@@ -23,9 +23,9 @@ public class PatientService {
         return patientRepository.findAll();
     }
 
-    public Patient getPatient(String email) {
-        return patientRepository.findByEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
+    public Patient getPatient(Long id) {
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
     }
 
     @Transactional
@@ -38,15 +38,15 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    public void removePatient(String email) {
-        Patient patient = patientRepository.findByEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
+    public void removePatient(Long id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
         patientRepository.delete(patient);
         }
 
-    public Patient editPatient(String email, Patient updatedpatient) {
-        Patient patient = patientRepository.findByEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
+    public Patient editPatient(Long id, Patient updatedpatient) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
         PatientValidator.validatePatientEdit(patient, updatedpatient, patientRepository);
         patient.edit(updatedpatient);
         return patientRepository.save(patient);

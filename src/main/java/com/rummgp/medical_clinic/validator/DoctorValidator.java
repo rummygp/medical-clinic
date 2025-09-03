@@ -1,7 +1,6 @@
 package com.rummgp.medical_clinic.validator;
 
 import com.rummgp.medical_clinic.model.Doctor;
-import com.rummgp.medical_clinic.repository.DoctorRepository;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
