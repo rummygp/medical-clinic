@@ -1,12 +1,14 @@
 package com.rummgp.medical_clinic.service;
 
 import com.rummgp.medical_clinic.exception.notFound.DoctorNotFoundException;
+import com.rummgp.medical_clinic.exception.notFound.InstitutionNotFoundException;
 import com.rummgp.medical_clinic.exception.notFound.UserNotFoundException;
 import com.rummgp.medical_clinic.model.Doctor;
+import com.rummgp.medical_clinic.model.Institution;
 import com.rummgp.medical_clinic.repository.DoctorRepository;
+import com.rummgp.medical_clinic.repository.InstitutionRepository;
 import com.rummgp.medical_clinic.repository.UserRepository;
 import com.rummgp.medical_clinic.validator.DoctorValidator;
-import jakarta.validation.constraints.Negative;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final UserRepository userRepository;
+    private final InstitutionRepository institutionRepository;
 
     public List<Doctor> getAllDoctors() {
         return doctorRepository.findAll();
@@ -47,6 +50,15 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorNotFoundException(id));
         doctor.edit(updatedDoctor);
+        return doctorRepository.save(doctor);
+    }
+
+    public Doctor addInstitutionToDoctor(Long doctorId, Long institutionId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new DoctorNotFoundException(doctorId));
+        Institution institution = institutionRepository.findById(institutionId)
+                .orElseThrow(() -> new InstitutionNotFoundException(institutionId));
+        doctor.getInstitutions().add(institution);
         return doctorRepository.save(doctor);
     }
 }

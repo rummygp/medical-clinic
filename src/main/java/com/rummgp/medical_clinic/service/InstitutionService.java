@@ -24,7 +24,7 @@ public class InstitutionService {
     }
 
     public Institution addInstitution(Institution institution) {
-        InstitutionValidator.validateInstitutionCreate(institution);
+        InstitutionValidator.validateInstitutionCreate(institution, institutionRepository);
         return institutionRepository.save(institution);
     }
 
@@ -35,7 +35,7 @@ public class InstitutionService {
     }
 
     public Institution updateInstitution(Long id, Institution updatedInstitution) {
-        InstitutionValidator.validateInstitutionUpdate(updatedInstitution);
+        InstitutionValidator.validateInstitutionUpdate(updatedInstitution, institutionRepository);
         Institution institution = institutionRepository.findById(id)
                 .orElseThrow(() -> new InstitutionNotFoundException(id));
         institution.edit(updatedInstitution);

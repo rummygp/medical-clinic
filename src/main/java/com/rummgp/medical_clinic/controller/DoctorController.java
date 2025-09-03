@@ -58,4 +58,23 @@ public class DoctorController {
     public DoctorDto addDoctor(@RequestBody DoctorCreateCommand doctor) {
         return doctorMapper.toDto(doctorService.addDoctor(doctorMapper.toEntity(doctor)));
     }
+
+    @Operation(summary = "Add institution to doctor using their IDs")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Institution has been added to doctor successfully",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = DoctorDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Doctor not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Institution not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))})})
+    @PostMapping("/{doctorId}/institutions/{institutionId}")
+    public DoctorDto addInstitutionToDoctor(@PathVariable Long doctorId, @PathVariable Long institutionId) {
+        return doctorMapper.toDto(doctorService.addInstitutionToDoctor(doctorId, institutionId));
+    }
 }

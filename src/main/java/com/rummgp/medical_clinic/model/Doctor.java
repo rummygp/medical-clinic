@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -25,7 +26,7 @@ public class Doctor {
     @JoinTable(
             joinColumns = @JoinColumn(name = "doctor_id"),
             inverseJoinColumns = @JoinColumn(name = "institutions_id"))
-    private List<Institution> institutions;
+    private List<Institution> institutions = new ArrayList<>();
 
     public void edit(Doctor newData) {
         this.firstName = newData.getFirstName();
