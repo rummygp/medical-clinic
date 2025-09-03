@@ -23,4 +23,12 @@ public class Institution {
     private String buildingNo;
     @ManyToMany(mappedBy = "institutions")
     private List<Doctor> doctors;
+
+    public void edit(Institution newData) {
+        this.name = newData.getName();
+        this.city = newData.getCity();
+        this.postalCode = newData.getPostalCode();
+        this.street = newData.getCity();
+        this.buildingNo = newData.getBuildingNo();
+    }
 }

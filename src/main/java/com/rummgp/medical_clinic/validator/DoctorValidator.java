@@ -17,7 +17,7 @@ public final class DoctorValidator {
     public static void validateDoctorUpdate(Doctor updatedDoctor) {
         if (updatedDoctor.getFirstName() == null ||
         updatedDoctor.getLastName() == null ||
-        updatedDoctor.getInstitutions() == null) {
+        updatedDoctor.getSpecialization() == null) {
             throw new IllegalArgumentException("Fields should not be null");
         }
     }

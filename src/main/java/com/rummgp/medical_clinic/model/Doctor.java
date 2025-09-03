@@ -28,8 +28,8 @@ public class Doctor {
     private List<Institution> institutions;
 
     public void edit(Doctor newData) {
-        this.firstName = newData.firstName;
-        this.lastName = newData.lastName;
-        this.specialization = newData.specialization;
+        this.firstName = newData.getFirstName();
+        this.lastName = newData.getLastName();
+        this.specialization = newData.getSpecialization();
     }
 }
