@@ -73,7 +73,7 @@ public class DoctorController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
-    @PostMapping("/{doctorId}/institutions/{institutionId}")
+    @PutMapping("/{doctorId}/institutions/{institutionId}")
     public DoctorDto addInstitutionToDoctor(@PathVariable Long doctorId, @PathVariable Long institutionId) {
         return doctorMapper.toDto(doctorService.addInstitutionToDoctor(doctorId, institutionId));
     }
