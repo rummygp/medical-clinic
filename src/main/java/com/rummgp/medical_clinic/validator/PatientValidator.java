@@ -11,21 +11,16 @@ public final class PatientValidator {
         public static void validatePatientCreate(Patient patient, PatientRepository patientRepository) {
             if (patient.getFirstName() == null ||
                     patient.getLastName() == null||
-                    patient.getEmail() == null ||
                     patient.getIdCardNo() == null ||
                     patient.getPhoneNumber() == null ||
                     patient.getBirthday() == null) {
                 throw new IllegalArgumentException("Fields should not be null");
-            }
-            if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
-                throw new EmailAlreadyExistsException(patient.getEmail());
             }
         }
 
         public static void validatePatientEdit(Patient patient, Patient updatedpatient, PatientRepository patientRepository) {
             if (updatedpatient.getFirstName() == null ||
                     updatedpatient.getLastName() == null||
-                    updatedpatient.getEmail() == null ||
                     updatedpatient.getIdCardNo() == null ||
                     updatedpatient.getPhoneNumber() == null ||
                     updatedpatient.getBirthday() == null) {
@@ -33,9 +28,6 @@ public final class PatientValidator {
             }
             if (!patient.getIdCardNo().equals(updatedpatient.getIdCardNo())) {
                 throw new IllegalArgumentException("Id Card number can't be changed");
-            }
-            if ((!patient.getEmail().equals(updatedpatient.getEmail()) && patientRepository.findByEmail(updatedpatient.getEmail()).isPresent())) {
-                throw new EmailAlreadyExistsException(updatedpatient.getEmail());
             }
         }
 }

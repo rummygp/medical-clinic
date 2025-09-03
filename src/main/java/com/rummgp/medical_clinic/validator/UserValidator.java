@@ -1,6 +1,6 @@
 package com.rummgp.medical_clinic.validator;
 
-import com.rummgp.medical_clinic.exception.UserNotFoundException;
+import com.rummgp.medical_clinic.exception.notFound.UserNotFoundException;
 import com.rummgp.medical_clinic.exception.UsernameAlreadyExistsException;
 import com.rummgp.medical_clinic.model.User;
 import com.rummgp.medical_clinic.repository.UserRepository;
@@ -18,9 +18,6 @@ public final class UserValidator {
         }
         if (user.getId() == null && userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException(user.getUsername());
-        }
-        if (user.getId() != null && userRepository.findById(user.getId()).isEmpty()) {
-            throw new UserNotFoundException(user.getId());
         }
     }
 

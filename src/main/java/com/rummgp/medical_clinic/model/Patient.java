@@ -17,8 +17,6 @@ public class Patient {
     private Long id;
     private String firstName;
     private String lastName;
-    @Column(unique = true)
-    private String email;
     @Column(name = "CARD_NUMBER_ID", unique = true)
     private String idCardNo;
     private String phoneNumber;
@@ -28,7 +26,6 @@ public class Patient {
     private User user;
 
     public void edit(Patient newData) {
-        this.email = newData.getEmail();
         this.idCardNo = newData.getIdCardNo();
         this.firstName = newData.getFirstName();
         this.lastName = newData.getLastName();

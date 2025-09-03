@@ -1,7 +1,7 @@
 package com.rummgp.medical_clinic.service;
 
-import com.rummgp.medical_clinic.exception.PatientNotFoundException;
-import com.rummgp.medical_clinic.exception.UserNotFoundException;
+import com.rummgp.medical_clinic.exception.notFound.PatientNotFoundException;
+import com.rummgp.medical_clinic.exception.notFound.UserNotFoundException;
 import com.rummgp.medical_clinic.model.Patient;
 import com.rummgp.medical_clinic.repository.PatientRepository;
 import com.rummgp.medical_clinic.repository.UserRepository;
