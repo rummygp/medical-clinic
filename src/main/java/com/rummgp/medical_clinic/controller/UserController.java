@@ -55,7 +55,7 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping("/{id}")
-    public UserDto getPatientByEmail(@PathVariable Long id) {
+    public UserDto getUserById(@PathVariable Long id) {
         return userMapper.toDto(userService.getUser(id));
     }
 
