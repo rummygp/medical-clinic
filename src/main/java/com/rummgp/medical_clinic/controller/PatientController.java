@@ -54,7 +54,7 @@ public class PatientController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping("/{id}")
-    public PatientDto getPatientByEmail(@PathVariable Long id) {
+    public PatientDto getPatientById(@PathVariable Long id) {
         return patientMapper.toDto(patientService.getPatient(id));
     }
 
