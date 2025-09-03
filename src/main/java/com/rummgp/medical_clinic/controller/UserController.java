@@ -79,23 +79,6 @@ public class UserController {
         return userMapper.toDto(userService.addUser(userMapper.toEntity(user)));
     }
 
-    @Operation(summary = "Delete user by id")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "User has been deleted.",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "404", description = "User not found.",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorMessageDto.class))})})
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeUserById(@PathVariable Long id) {
-        userService.removeUser(id);
-    }
-
     @Operation(summary = "Change password using id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password has been changed successfully",

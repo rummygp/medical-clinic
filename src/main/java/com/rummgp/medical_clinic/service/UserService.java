@@ -29,12 +29,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void removeUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(()-> new UserNotFoundException(id));
-        userRepository.delete(user);
-    }
-
     public User changeUserPassword(Long id, String password) {
         UserValidator.validatePasswordEdit(password);
         User user = userRepository.findById(id)
