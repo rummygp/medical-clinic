@@ -12,8 +12,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface DoctorMapper {
+
     @Mapping(source = "institutions", target = "institutionsId", qualifiedByName = "institutionsToId")
     DoctorDto toDto(Doctor doctor);
+
     Doctor toEntity(DoctorCreateCommand doctorCreateCommand);
 
     @Named("institutionsToId")

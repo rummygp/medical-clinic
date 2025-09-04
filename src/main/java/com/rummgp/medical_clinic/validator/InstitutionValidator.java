@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InstitutionValidator {
+
     public static void validateInstitutionCreate(Institution institution, InstitutionRepository institutionRepository) {
         if (institution.getName() == null ||
                 institution.getCity() == null ||

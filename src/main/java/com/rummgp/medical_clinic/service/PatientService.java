@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class PatientService {
-
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
 
@@ -42,7 +41,7 @@ public class PatientService {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         patientRepository.delete(patient);
-        }
+    }
 
     public Patient editPatient(Long id, Patient updatedpatient) {
         Patient patient = patientRepository.findById(id)

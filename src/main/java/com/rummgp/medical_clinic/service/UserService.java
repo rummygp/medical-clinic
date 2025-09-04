@@ -12,7 +12,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
 
     public List<User> getAll() {
@@ -21,7 +20,7 @@ public class UserService {
 
     public User getUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(()-> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public User addUser(User user) {
@@ -32,7 +31,7 @@ public class UserService {
     public User changeUserPassword(Long id, String password) {
         UserValidator.validatePasswordEdit(password);
         User user = userRepository.findById(id)
-                .orElseThrow(()-> new UserNotFoundException(id));
+                .orElseThrow(() -> new UserNotFoundException(id));
         user.setPassword(password);
         return userRepository.save(user);
     }
