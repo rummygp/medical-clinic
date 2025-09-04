@@ -1,6 +1,7 @@
 package com.rummgp.medical_clinic.validator;
 
-import com.rummgp.medical_clinic.exception.EmailAlreadyExistsException;
+import com.rummgp.medical_clinic.exception.FieldsShouldNotBeNullException;
+import com.rummgp.medical_clinic.exception.ImmutableFieldException;
 import com.rummgp.medical_clinic.model.Patient;
 import com.rummgp.medical_clinic.repository.PatientRepository;
 import lombok.AccessLevel;
@@ -15,7 +16,7 @@ public final class PatientValidator {
                 patient.getIdCardNo() == null ||
                 patient.getPhoneNumber() == null ||
                 patient.getBirthday() == null) {
-            throw new IllegalArgumentException("Fields should not be null");
+            throw new FieldsShouldNotBeNullException();
         }
     }
 
@@ -25,10 +26,10 @@ public final class PatientValidator {
                 updatedpatient.getIdCardNo() == null ||
                 updatedpatient.getPhoneNumber() == null ||
                 updatedpatient.getBirthday() == null) {
-            throw new IllegalArgumentException("Fields should not be null");
+            throw new FieldsShouldNotBeNullException();
         }
         if (!patient.getIdCardNo().equals(updatedpatient.getIdCardNo())) {
-            throw new IllegalArgumentException("Id Card number can't be changed");
+            throw new ImmutableFieldException("idCardNo");
         }
     }
 }

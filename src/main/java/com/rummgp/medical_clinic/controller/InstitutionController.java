@@ -36,8 +36,8 @@ public class InstitutionController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public List<InstitutionDto> getInstitutions() {
-        return institutionService.getAll().stream()
+    public List<InstitutionDto> findAll() {
+        return institutionService.findAll().stream()
                 .map(institutionMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -50,7 +50,7 @@ public class InstitutionController {
             @ApiResponse(responseCode = "409", description = "Institution with this name already exists",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Fields should not be null",
+            @ApiResponse(responseCode = "400", description = "Fields should not be null",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -58,7 +58,7 @@ public class InstitutionController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public InstitutionDto addInstitution(@RequestBody InstitutionCreateCommand institution) {
-        return institutionMapper.toDto(institutionService.addInstitution(institutionMapper.toEntity(institution)));
+    public InstitutionDto add(@RequestBody InstitutionCreateCommand institution) {
+        return institutionMapper.toDto(institutionService.add(institutionMapper.toEntity(institution)));
     }
 }

@@ -1,5 +1,6 @@
 package com.rummgp.medical_clinic.validator;
 
+import com.rummgp.medical_clinic.exception.FieldsShouldNotBeNullException;
 import com.rummgp.medical_clinic.model.Doctor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ public final class DoctorValidator {
         if (doctor.getFirstName() == null ||
                 doctor.getLastName() == null ||
                 doctor.getSpecialization() == null) {
-            throw new IllegalArgumentException("Fields should not be null");
+            throw new FieldsShouldNotBeNullException();
         }
     }
 
@@ -19,7 +20,7 @@ public final class DoctorValidator {
         if (updatedDoctor.getFirstName() == null ||
                 updatedDoctor.getLastName() == null ||
                 updatedDoctor.getSpecialization() == null) {
-            throw new IllegalArgumentException("Fields should not be null");
+            throw new FieldsShouldNotBeNullException();
         }
     }
 }

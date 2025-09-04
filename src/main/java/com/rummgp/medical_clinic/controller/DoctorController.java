@@ -30,14 +30,14 @@ public class DoctorController {
     @Operation(summary = "Get all Doctors")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctors list returned",
-            content = {@Content(mediaType = "application/json",
-            array = @ArraySchema(schema = @Schema(implementation = DoctorDto.class)))}),
+                    content = {@Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = DoctorDto.class)))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public List<DoctorDto> getDoctors() {
-        return doctorService.getAllDoctors().stream()
+    public List<DoctorDto> findAll() {
+        return doctorService.findAll().stream()
                 .map(doctorMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -47,7 +47,7 @@ public class DoctorController {
             @ApiResponse(responseCode = "201", description = "Doctor has been created.",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = DoctorDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Fields should not be null",
+            @ApiResponse(responseCode = "400", description = "Fields should not be null",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -55,8 +55,8 @@ public class DoctorController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public DoctorDto addDoctor(@RequestBody DoctorCreateCommand doctor) {
-        return doctorMapper.toDto(doctorService.addDoctor(doctorMapper.toEntity(doctor)));
+    public DoctorDto add(@RequestBody DoctorCreateCommand doctor) {
+        return doctorMapper.toDto(doctorService.add(doctorMapper.toEntity(doctor)));
     }
 
     @Operation(summary = "Add institution to doctor using their IDs")
@@ -64,10 +64,7 @@ public class DoctorController {
             @ApiResponse(responseCode = "200", description = "Institution has been added to doctor successfully",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = DoctorDto.class))}),
-            @ApiResponse(responseCode = "404", description = "Doctor not found",
-                    content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "404", description = "Institution not found",
+            @ApiResponse(responseCode = "404", description = "Doctor/Institution not found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -75,6 +72,6 @@ public class DoctorController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PutMapping("/{doctorId}/institutions/{institutionId}")
     public DoctorDto addInstitutionToDoctor(@PathVariable Long doctorId, @PathVariable Long institutionId) {
-        return doctorMapper.toDto(doctorService.addInstitutionToDoctor(doctorId, institutionId));
+        return doctorMapper.toDto(doctorService.assignInstitutionToDoctor(doctorId, institutionId));
     }
 }

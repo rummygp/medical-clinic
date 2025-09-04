@@ -36,8 +36,8 @@ public class PatientController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public List<PatientDto> getPatients() {
-        return patientService.getAll().stream()
+    public List<PatientDto> findAll() {
+        return patientService.findAll().stream()
                 .map(patientMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -54,8 +54,8 @@ public class PatientController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping("/{id}")
-    public PatientDto getPatientById(@PathVariable Long id) {
-        return patientMapper.toDto(patientService.getPatient(id));
+    public PatientDto find(@PathVariable Long id) {
+        return patientMapper.toDto(patientService.find(id));
     }
 
     @Operation(summary = "Add patient")
@@ -63,7 +63,7 @@ public class PatientController {
             @ApiResponse(responseCode = "201", description = "Patient has been created.",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = PatientDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Fields should not be null",
+            @ApiResponse(responseCode = "400", description = "Fields should not be null",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -71,8 +71,8 @@ public class PatientController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PatientDto addPatient(@RequestBody PatientCreateCommand patient) {
-        return patientMapper.toDto(patientService.addPatient(patientMapper.toEntity(patient)));
+    public PatientDto add(@RequestBody PatientCreateCommand patient) {
+        return patientMapper.toDto(patientService.add(patientMapper.toEntity(patient)));
     }
 
     @Operation(summary = "Delete patient by id")
@@ -88,8 +88,8 @@ public class PatientController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removePatientById(@PathVariable Long id) {
-        patientService.removePatient(id);
+    public void delete(@PathVariable Long id) {
+        patientService.delete(id);
     }
 
     @Operation(summary = "Edit patient using id")
@@ -100,17 +100,17 @@ public class PatientController {
             @ApiResponse(responseCode = "404", description = "Patient not found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Fields should not be null",
+            @ApiResponse(responseCode = "400", description = "Fields should not be null",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Id Card number can't be changed",
+            @ApiResponse(responseCode = "409", description = "Id Card number can't be changed",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PutMapping("/{id}")
-    public PatientDto editPatient(@PathVariable Long id, @RequestBody PatientCreateCommand patient) {
-        return patientMapper.toDto(patientService.editPatient(id, patientMapper.toEntity(patient)));
+    public PatientDto edit(@PathVariable Long id, @RequestBody PatientCreateCommand patient) {
+        return patientMapper.toDto(patientService.edit(id, patientMapper.toEntity(patient)));
     }
 }

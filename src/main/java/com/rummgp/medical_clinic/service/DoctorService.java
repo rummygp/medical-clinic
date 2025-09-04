@@ -21,31 +21,28 @@ public class DoctorService {
     private final UserRepository userRepository;
     private final InstitutionRepository institutionRepository;
 
-    public List<Doctor> getAllDoctors() {
+    public List<Doctor> findAll() {
         return doctorRepository.findAll();
     }
 
-    public Doctor getDoctor(Long id) {
+    public Doctor find(Long id) {
         return doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorNotFoundException(id));
     }
 
-    public Doctor addDoctor(Doctor doctor) {
+    public Doctor add(Doctor doctor) {
         DoctorValidator.validateDoctorCreate(doctor);
-        if (doctor.getUser().getId() != null) {
-            doctor.setUser(userRepository.findById(doctor.getUser().getId())
-                    .orElseThrow(() -> new UserNotFoundException(doctor.getUser().getId())));
-        }
+        assignUserToDoctor(doctor);
         return doctorRepository.save(doctor);
     }
 
-    public void removeDoctor(Long id) {
+    public void delete(Long id) {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorNotFoundException(id));
         doctorRepository.delete(doctor);
     }
 
-    public Doctor updateDoctor(Long id, Doctor updatedDoctor) {
+    public Doctor update(Long id, Doctor updatedDoctor) {
         DoctorValidator.validateDoctorUpdate(updatedDoctor);
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorNotFoundException(id));
@@ -53,12 +50,19 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
-    public Doctor addInstitutionToDoctor(Long doctorId, Long institutionId) {
+    public Doctor assignInstitutionToDoctor(Long doctorId, Long institutionId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new DoctorNotFoundException(doctorId));
         Institution institution = institutionRepository.findById(institutionId)
                 .orElseThrow(() -> new InstitutionNotFoundException(institutionId));
         doctor.getInstitutions().add(institution);
         return doctorRepository.save(doctor);
+    }
+
+    private void assignUserToDoctor(Doctor doctor) {
+        if (doctor.getUser().getId() != null) {
+            doctor.setUser(userRepository.findById(doctor.getUser().getId())
+                    .orElseThrow(() -> new UserNotFoundException(doctor.getUser().getId())));
+        }
     }
 }

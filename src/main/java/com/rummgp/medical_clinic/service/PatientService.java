@@ -18,36 +18,40 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
 
-    public List<Patient> getAll() {
+    public List<Patient> findAll() {
         return patientRepository.findAll();
     }
 
-    public Patient getPatient(Long id) {
+    public Patient find(Long id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
     }
 
     @Transactional
-    public Patient addPatient(Patient patient) {
+    public Patient add(Patient patient) {
         PatientValidator.validatePatientCreate(patient, patientRepository);
-        if (patient.getUser().getId() != null) {
-            patient.setUser(userRepository.findById(patient.getUser().getId())
-                    .orElseThrow(() -> new UserNotFoundException(patient.getUser().getId())));
-        }
+        assignUserToPatient(patient);
         return patientRepository.save(patient);
     }
 
-    public void removePatient(Long id) {
+    public void delete(Long id) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         patientRepository.delete(patient);
     }
 
-    public Patient editPatient(Long id, Patient updatedpatient) {
+    public Patient edit(Long id, Patient updatedpatient) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         PatientValidator.validatePatientEdit(patient, updatedpatient, patientRepository);
         patient.edit(updatedpatient);
         return patientRepository.save(patient);
+    }
+
+    private void assignUserToPatient(Patient patient) {
+        if (patient.getUser().getId() != null) {
+            patient.setUser(userRepository.findById(patient.getUser().getId())
+                    .orElseThrow(() -> new UserNotFoundException(patient.getUser().getId())));
+        }
     }
 }

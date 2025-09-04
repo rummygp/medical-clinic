@@ -14,21 +14,21 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<User> getAll() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    public User getUser(Long id) {
+    public User find(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public User addUser(User user) {
+    public User add(User user) {
         UserValidator.validateUserCreate(user, userRepository);
         return userRepository.save(user);
     }
 
-    public User changeUserPassword(Long id, String password) {
+    public User changePassword(Long id, String password) {
         UserValidator.validatePasswordEdit(password);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));

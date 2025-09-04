@@ -14,27 +14,27 @@ import java.util.List;
 public class InstitutionService {
     private final InstitutionRepository institutionRepository;
 
-    public List<Institution> getAll() {
+    public List<Institution> findAll() {
         return institutionRepository.findAll();
     }
 
-    public Institution getInstitution(Long id) {
+    public Institution find(Long id) {
         return institutionRepository.findById(id)
                 .orElseThrow(() -> new InstitutionNotFoundException(id));
     }
 
-    public Institution addInstitution(Institution institution) {
+    public Institution add(Institution institution) {
         InstitutionValidator.validateInstitutionCreate(institution, institutionRepository);
         return institutionRepository.save(institution);
     }
 
-    public void removeInstitution(Long id) {
+    public void delete(Long id) {
         Institution institution = institutionRepository.findById(id)
                 .orElseThrow(() -> new InstitutionNotFoundException(id));
         institutionRepository.delete(institution);
     }
 
-    public Institution updateInstitution(Long id, Institution updatedInstitution) {
+    public Institution update(Long id, Institution updatedInstitution) {
         InstitutionValidator.validateInstitutionUpdate(updatedInstitution, institutionRepository);
         Institution institution = institutionRepository.findById(id)
                 .orElseThrow(() -> new InstitutionNotFoundException(id));

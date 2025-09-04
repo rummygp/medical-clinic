@@ -1,5 +1,6 @@
 package com.rummgp.medical_clinic.validator;
 
+import com.rummgp.medical_clinic.exception.FieldsShouldNotBeNullException;
 import com.rummgp.medical_clinic.exception.UsernameAlreadyExistsException;
 import com.rummgp.medical_clinic.model.User;
 import com.rummgp.medical_clinic.repository.UserRepository;
@@ -14,7 +15,7 @@ public final class UserValidator {
                 (user.getEmail() == null ||
                         user.getUsername() == null ||
                         user.getPassword() == null)) {
-            throw new IllegalArgumentException("Fields should not be null");
+            throw new FieldsShouldNotBeNullException();
         }
         if (user.getId() == null && userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException(user.getUsername());
@@ -23,7 +24,7 @@ public final class UserValidator {
 
     public static void validatePasswordEdit(String password) {
         if (password == null) {
-            throw new IllegalArgumentException("Fields should not be null");
+            throw new FieldsShouldNotBeNullException();
         }
     }
 }

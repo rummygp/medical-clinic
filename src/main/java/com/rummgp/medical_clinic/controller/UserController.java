@@ -37,8 +37,8 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public List<UserDto> getUsers() {
-        return userService.getAll().stream()
+    public List<UserDto> findAll() {
+        return userService.findAll().stream()
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -55,8 +55,8 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable Long id) {
-        return userMapper.toDto(userService.getUser(id));
+    public UserDto find(@PathVariable Long id) {
+        return userMapper.toDto(userService.find(id));
     }
 
     @Operation(summary = "Add user")
@@ -67,7 +67,7 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "User with this username already exists",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Fields should not be null",
+            @ApiResponse(responseCode = "400", description = "Fields should not be null",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -75,8 +75,8 @@ public class UserController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto addUser(@RequestBody UserCreateCommand user) {
-        return userMapper.toDto(userService.addUser(userMapper.toEntity(user)));
+    public UserDto add(@RequestBody UserCreateCommand user) {
+        return userMapper.toDto(userService.add(userMapper.toEntity(user)));
     }
 
     @Operation(summary = "Change password using id")
@@ -87,7 +87,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
-            @ApiResponse(responseCode = "500", description = "Fields should not be null",
+            @ApiResponse(responseCode = "400", description = "Fields should not be null",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -95,6 +95,6 @@ public class UserController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PatchMapping("/{id}")
     public UserDto changePassword(@PathVariable Long id, @RequestBody ChangePasswordCommand newPassword) {
-        return userMapper.toDto(userService.changeUserPassword(id, newPassword.password()));
+        return userMapper.toDto(userService.changePassword(id, newPassword.password()));
     }
 }
