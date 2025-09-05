@@ -9,6 +9,7 @@ import com.rummgp.medical_clinic.repository.DoctorRepository;
 import com.rummgp.medical_clinic.repository.InstitutionRepository;
 import com.rummgp.medical_clinic.repository.UserRepository;
 import com.rummgp.medical_clinic.validator.DoctorValidator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class DoctorService {
                 .orElseThrow(() -> new DoctorNotFoundException(id));
     }
 
+    @Transactional
     public Doctor add(Doctor doctor) {
         DoctorValidator.validateDoctorCreate(doctor);
         assignUserToDoctor(doctor);
