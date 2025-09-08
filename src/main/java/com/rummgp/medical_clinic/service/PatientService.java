@@ -1,8 +1,9 @@
 package com.rummgp.medical_clinic.service;
 
-import com.rummgp.medical_clinic.exception.notFound.PatientNotFoundException;
-import com.rummgp.medical_clinic.exception.notFound.UserNotFoundException;
+import com.rummgp.medical_clinic.exception.NotFoundException;
+import com.rummgp.medical_clinic.model.Appointment;
 import com.rummgp.medical_clinic.model.Patient;
+import com.rummgp.medical_clinic.repository.AppointmentRepository;
 import com.rummgp.medical_clinic.repository.PatientRepository;
 import com.rummgp.medical_clinic.repository.UserRepository;
 import com.rummgp.medical_clinic.validator.PatientValidator;
@@ -17,6 +18,7 @@ import java.util.List;
 public class PatientService {
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final AppointmentRepository appointmentRepository;
 
     public List<Patient> findAll() {
         return patientRepository.findAll();
@@ -24,7 +26,7 @@ public class PatientService {
 
     public Patient find(Long id) {
         return patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Patient", id));
     }
 
     @Transactional
@@ -37,24 +39,30 @@ public class PatientService {
     @Transactional
     public void delete(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Patient",id));
         patientRepository.delete(patient);
     }
 
     @Transactional
     public Patient edit(Long id, Patient updatedpatient) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Patient",id));
         PatientValidator.validatePatientEdit(patient, updatedpatient, patientRepository);
         patient.edit(updatedpatient);
         return patientRepository.save(patient);
+    }
+
+    public List<Appointment> findAllAppointments(Long id) {
+        patientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Patient",id));
+        return appointmentRepository.findByPatientId(id);
     }
 
     @Transactional
     private void assignUserToPatient(Patient patient) {
         if (patient.getUser().getId() != null) {
             patient.setUser(userRepository.findById(patient.getUser().getId())
-                    .orElseThrow(() -> new UserNotFoundException(patient.getUser().getId())));
+                    .orElseThrow(() -> new NotFoundException("User", patient.getUser().getId())));
         }
     }
 }

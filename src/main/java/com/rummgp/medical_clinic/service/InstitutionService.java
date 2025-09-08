@@ -1,6 +1,6 @@
 package com.rummgp.medical_clinic.service;
 
-import com.rummgp.medical_clinic.exception.notFound.InstitutionNotFoundException;
+import com.rummgp.medical_clinic.exception.NotFoundException;
 import com.rummgp.medical_clinic.model.Institution;
 import com.rummgp.medical_clinic.repository.InstitutionRepository;
 import com.rummgp.medical_clinic.validator.InstitutionValidator;
@@ -20,7 +20,7 @@ public class InstitutionService {
 
     public Institution find(Long id) {
         return institutionRepository.findById(id)
-                .orElseThrow(() -> new InstitutionNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Institution", id));
     }
 
     public Institution add(Institution institution) {
@@ -30,14 +30,14 @@ public class InstitutionService {
 
     public void delete(Long id) {
         Institution institution = institutionRepository.findById(id)
-                .orElseThrow(() -> new InstitutionNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Institution",id));
         institutionRepository.delete(institution);
     }
 
     public Institution update(Long id, Institution updatedInstitution) {
         InstitutionValidator.validateInstitutionUpdate(updatedInstitution, institutionRepository);
         Institution institution = institutionRepository.findById(id)
-                .orElseThrow(() -> new InstitutionNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Institution",id));
         institution.edit(updatedInstitution);
         return institutionRepository.save(institution);
     }

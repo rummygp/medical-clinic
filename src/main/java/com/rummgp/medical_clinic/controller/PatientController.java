@@ -1,8 +1,10 @@
 package com.rummgp.medical_clinic.controller;
 
 import com.rummgp.medical_clinic.command.PatientCreateCommand;
+import com.rummgp.medical_clinic.dto.AppointmentDto;
 import com.rummgp.medical_clinic.dto.ErrorMessageDto;
 import com.rummgp.medical_clinic.dto.PatientDto;
+import com.rummgp.medical_clinic.mapper.AppointmentMapper;
 import com.rummgp.medical_clinic.mapper.PatientMapper;
 import com.rummgp.medical_clinic.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class PatientController {
     private final PatientService patientService;
     private final PatientMapper patientMapper;
+    private final AppointmentMapper appointmentMapper;
 
     @Operation(summary = "Get all patients")
     @ApiResponses(value = {
@@ -112,5 +115,12 @@ public class PatientController {
     @PutMapping("/{id}")
     public PatientDto edit(@PathVariable Long id, @RequestBody PatientCreateCommand patient) {
         return patientMapper.toDto(patientService.edit(id, patientMapper.toEntity(patient)));
+    }
+
+    @GetMapping("/{id}/appointments")
+    public List<AppointmentDto> findAllAppointments(@PathVariable Long id){
+        return patientService.findAllAppointments(id).stream()
+                .map(appointmentMapper::toDto)
+                .toList();
     }
 }
