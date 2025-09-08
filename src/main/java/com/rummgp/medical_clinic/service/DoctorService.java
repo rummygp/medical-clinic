@@ -38,12 +38,14 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
+    @Transactional
     public void delete(Long id) {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorNotFoundException(id));
         doctorRepository.delete(doctor);
     }
 
+    @Transactional
     public Doctor update(Long id, Doctor updatedDoctor) {
         DoctorValidator.validateDoctorUpdate(updatedDoctor);
         Doctor doctor = doctorRepository.findById(id)
@@ -52,6 +54,7 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
+    @Transactional
     public Doctor assignInstitutionToDoctor(Long doctorId, Long institutionId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new DoctorNotFoundException(doctorId));
@@ -61,6 +64,7 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
+    @Transactional
     private void assignUserToDoctor(Doctor doctor) {
         if (doctor.getUser().getId() != null) {
             doctor.setUser(userRepository.findById(doctor.getUser().getId())

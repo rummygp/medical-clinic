@@ -34,12 +34,14 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
+    @Transactional
     public void delete(Long id) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
         patientRepository.delete(patient);
     }
 
+    @Transactional
     public Patient edit(Long id, Patient updatedpatient) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException(id));
@@ -48,6 +50,7 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
+    @Transactional
     private void assignUserToPatient(Patient patient) {
         if (patient.getUser().getId() != null) {
             patient.setUser(userRepository.findById(patient.getUser().getId())
