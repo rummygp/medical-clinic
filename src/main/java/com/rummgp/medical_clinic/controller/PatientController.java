@@ -116,11 +116,4 @@ public class PatientController {
     public PatientDto edit(@PathVariable Long id, @RequestBody PatientCreateCommand patient) {
         return patientMapper.toDto(patientService.edit(id, patientMapper.toEntity(patient)));
     }
-
-    @GetMapping("/{id}/appointments")
-    public List<AppointmentDto> findAllAppointments(@PathVariable Long id){
-        return patientService.findAllAppointments(id).stream()
-                .map(appointmentMapper::toDto)
-                .toList();
-    }
 }

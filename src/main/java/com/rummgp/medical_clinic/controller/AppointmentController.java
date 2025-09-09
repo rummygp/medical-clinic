@@ -2,7 +2,6 @@ package com.rummgp.medical_clinic.controller;
 
 import com.rummgp.medical_clinic.command.AppointmentCreateCommand;
 import com.rummgp.medical_clinic.dto.AppointmentDto;
-
 import com.rummgp.medical_clinic.dto.ErrorMessageDto;
 import com.rummgp.medical_clinic.mapper.AppointmentMapper;
 import com.rummgp.medical_clinic.service.AppointmentService;
@@ -60,10 +59,10 @@ public class AppointmentController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
-    @PostMapping("/add")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AppointmentDto addEmpty(@RequestParam Long doctorId, @RequestBody AppointmentCreateCommand appointment) {
-        return appointmentMapper.toDto(appointmentService.addEmpty(doctorId, appointmentMapper.toEntity(appointment)));
+    public AppointmentDto add(@RequestBody AppointmentCreateCommand appointment) {
+        return appointmentMapper.toDto(appointmentService.add(appointment));
     }
 
     @Operation(summary = "Book appointment for patient")
@@ -86,5 +85,12 @@ public class AppointmentController {
     @PatchMapping("/{appointmentId}/patients/{patientId}")
     public AppointmentDto book(@PathVariable Long appointmentId, @PathVariable Long patientId) {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
+    }
+
+    @GetMapping("/patients/{id}")
+    public List<AppointmentDto> findAllAppointments(@PathVariable Long id){
+        return appointmentService.findAllAppointments(id).stream()
+                .map(appointmentMapper::toDto)
+                .toList();
     }
 }

@@ -23,7 +23,7 @@ public final class AppointmentValidator {
             throw new InvalidAppointmentTimeException("Appointment must start and end on a full quarter of an hour");
         }
 
-        if (appointmentRepository.existsOverlapping(doctorId, appointment.getStartTime(), appointment.getEndTime())) {
+        if (!appointmentRepository.findOverlapping(doctorId, appointment.getStartTime(), appointment.getEndTime()).isEmpty()) {
             throw new AppointmentOverlapException("The appointment overlaps with another appointment of this doctor");
         }
     }

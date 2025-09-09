@@ -10,12 +10,12 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
     @Query("""
-            select count(v) > 0 from Appointment v
+            select v from Appointment v
             where v.doctor.id = :doctorId
             and v.startTime < :endTime
             and v.endTime > :startTime
             """)
-    boolean existsOverlapping(Long doctorId, LocalDateTime startTime, LocalDateTime endTime);
+    List<Appointment> findOverlapping(Long doctorId, LocalDateTime startTime, LocalDateTime endTime);
 
     List<Appointment> findByPatientId(Long patientId);
 }

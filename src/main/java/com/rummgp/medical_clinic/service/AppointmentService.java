@@ -1,6 +1,8 @@
 package com.rummgp.medical_clinic.service;
 
+import com.rummgp.medical_clinic.command.AppointmentCreateCommand;
 import com.rummgp.medical_clinic.exception.NotFoundException;
+import com.rummgp.medical_clinic.mapper.AppointmentMapper;
 import com.rummgp.medical_clinic.model.Appointment;
 import com.rummgp.medical_clinic.model.Doctor;
 import com.rummgp.medical_clinic.model.Patient;
@@ -20,21 +22,21 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final AppointmentMapper appointmentMapper;
 
     public List<Appointment> findAll() {
         return appointmentRepository.findAll();
     }
 
-    @Transactional
-    public Appointment addEmpty(Long doctorId, Appointment appointment) {
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new NotFoundException("Doctor", doctorId));
-        AppointmentValidator.validateAppointmentCreate(appointment, appointmentRepository, doctorId);
-        appointment.setDoctor(doctor);
-        return appointmentRepository.save(appointment);
+    public Appointment add(AppointmentCreateCommand appointment) {
+        Doctor doctor = doctorRepository.findById(appointment.doctorId())
+                .orElseThrow(() -> new NotFoundException("Doctor", appointment.doctorId()));
+        Appointment newAppointment = appointmentMapper.toEntity(appointment);
+        AppointmentValidator.validateAppointmentCreate(newAppointment, appointmentRepository, doctor.getId());
+        newAppointment.setDoctor(doctor);
+        return appointmentRepository.save(newAppointment);
     }
 
-    @Transactional
     public Appointment bookAppointment(Long appointmentId, Long patientId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new NotFoundException("Appointment", appointmentId));
@@ -44,5 +46,11 @@ public class AppointmentService {
                         .orElseThrow(() -> new NotFoundException("Patient",patientId));
         appointment.setPatient(patient);
         return appointmentRepository.save(appointment);
+    }
+
+    public List<Appointment> findAllAppointments(Long id) {
+        patientRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Patient",id));
+        return appointmentRepository.findByPatientId(id);
     }
 }

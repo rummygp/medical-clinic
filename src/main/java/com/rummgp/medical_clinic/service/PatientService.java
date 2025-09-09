@@ -52,13 +52,6 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    public List<Appointment> findAllAppointments(Long id) {
-        patientRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Patient",id));
-        return appointmentRepository.findByPatientId(id);
-    }
-
-    @Transactional
     private void assignUserToPatient(Patient patient) {
         if (patient.getUser().getId() != null) {
             patient.setUser(userRepository.findById(patient.getUser().getId())
