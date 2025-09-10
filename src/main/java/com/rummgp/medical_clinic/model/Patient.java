@@ -30,7 +30,6 @@ public class Patient {
     private List<Appointment> appointments = new ArrayList<>();
 
     public void edit(Patient newData) {
-        this.idCardNo = newData.getIdCardNo();
         this.firstName = newData.getFirstName();
         this.lastName = newData.getLastName();
         this.phoneNumber = newData.getPhoneNumber();
