@@ -10,7 +10,6 @@ import com.rummgp.medical_clinic.repository.AppointmentRepository;
 import com.rummgp.medical_clinic.repository.DoctorRepository;
 import com.rummgp.medical_clinic.repository.PatientRepository;
 import com.rummgp.medical_clinic.validator.AppointmentValidator;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

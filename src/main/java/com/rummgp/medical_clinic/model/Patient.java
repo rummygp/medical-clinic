@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Entity
 public class Patient {
     @Id
@@ -34,5 +33,19 @@ public class Patient {
         this.lastName = newData.getLastName();
         this.phoneNumber = newData.getPhoneNumber();
         this.birthday = newData.getBirthday();
+    }
+
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", idCardNo='" + idCardNo + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", birthday=" + birthday +
+                ", user=" + user +
+                ", appointments=" + appointments.stream().map(Appointment::getDoctor).map(Doctor::getId).toList() +
+                '}';
     }
 }
