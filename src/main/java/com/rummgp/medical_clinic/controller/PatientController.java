@@ -1,8 +1,10 @@
 package com.rummgp.medical_clinic.controller;
 
 import com.rummgp.medical_clinic.command.PatientCreateCommand;
+import com.rummgp.medical_clinic.dto.AppointmentDto;
 import com.rummgp.medical_clinic.dto.ErrorMessageDto;
 import com.rummgp.medical_clinic.dto.PatientDto;
+import com.rummgp.medical_clinic.mapper.AppointmentMapper;
 import com.rummgp.medical_clinic.mapper.PatientMapper;
 import com.rummgp.medical_clinic.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class PatientController {
     private final PatientService patientService;
     private final PatientMapper patientMapper;
+    private final AppointmentMapper appointmentMapper;
 
     @Operation(summary = "Get all patients")
     @ApiResponses(value = {

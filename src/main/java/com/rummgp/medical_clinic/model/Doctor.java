@@ -27,6 +27,8 @@ public class Doctor {
             joinColumns = @JoinColumn(name = "doctor_id"),
             inverseJoinColumns = @JoinColumn(name = "institutions_id"))
     private List<Institution> institutions = new ArrayList<>();
+    @OneToMany(mappedBy = "doctor")
+    private List<Appointment> appointments = new ArrayList<>();
 
     public void edit(Doctor newData) {
         this.firstName = newData.getFirstName();

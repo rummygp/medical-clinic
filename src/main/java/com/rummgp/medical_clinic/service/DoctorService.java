@@ -1,14 +1,13 @@
 package com.rummgp.medical_clinic.service;
 
-import com.rummgp.medical_clinic.exception.notFound.DoctorNotFoundException;
-import com.rummgp.medical_clinic.exception.notFound.InstitutionNotFoundException;
-import com.rummgp.medical_clinic.exception.notFound.UserNotFoundException;
+import com.rummgp.medical_clinic.exception.NotFoundException;
 import com.rummgp.medical_clinic.model.Doctor;
 import com.rummgp.medical_clinic.model.Institution;
 import com.rummgp.medical_clinic.repository.DoctorRepository;
 import com.rummgp.medical_clinic.repository.InstitutionRepository;
 import com.rummgp.medical_clinic.repository.UserRepository;
 import com.rummgp.medical_clinic.validator.DoctorValidator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,42 +26,47 @@ public class DoctorService {
 
     public Doctor find(Long id) {
         return doctorRepository.findById(id)
-                .orElseThrow(() -> new DoctorNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Doctor", id));
     }
 
+    @Transactional
     public Doctor add(Doctor doctor) {
         DoctorValidator.validateDoctorCreate(doctor);
         assignUserToDoctor(doctor);
         return doctorRepository.save(doctor);
     }
 
+    @Transactional
     public void delete(Long id) {
         Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new DoctorNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Doctor",id));
         doctorRepository.delete(doctor);
     }
 
+    @Transactional
     public Doctor update(Long id, Doctor updatedDoctor) {
         DoctorValidator.validateDoctorUpdate(updatedDoctor);
         Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new DoctorNotFoundException(id));
+                .orElseThrow(() -> new NotFoundException("Doctor",id));
         doctor.edit(updatedDoctor);
         return doctorRepository.save(doctor);
     }
 
+    @Transactional
     public Doctor assignInstitutionToDoctor(Long doctorId, Long institutionId) {
         Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new DoctorNotFoundException(doctorId));
+                .orElseThrow(() -> new NotFoundException("Doctor",doctorId));
         Institution institution = institutionRepository.findById(institutionId)
-                .orElseThrow(() -> new InstitutionNotFoundException(institutionId));
+                .orElseThrow(() -> new NotFoundException("Institution",institutionId));
         doctor.getInstitutions().add(institution);
         return doctorRepository.save(doctor);
     }
 
+    @Transactional
     private void assignUserToDoctor(Doctor doctor) {
         if (doctor.getUser().getId() != null) {
             doctor.setUser(userRepository.findById(doctor.getUser().getId())
-                    .orElseThrow(() -> new UserNotFoundException(doctor.getUser().getId())));
+                    .orElseThrow(() -> new NotFoundException("User", doctor.getUser().getId())));
         }
     }
 }

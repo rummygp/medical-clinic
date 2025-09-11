@@ -23,7 +23,6 @@ public final class PatientValidator {
     public static void validatePatientEdit(Patient patient, Patient updatedpatient, PatientRepository patientRepository) {
         if (updatedpatient.getFirstName() == null ||
                 updatedpatient.getLastName() == null ||
-                updatedpatient.getIdCardNo() == null ||
                 updatedpatient.getPhoneNumber() == null ||
                 updatedpatient.getBirthday() == null) {
             throw new FieldsShouldNotBeNullException();
