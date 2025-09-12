@@ -1,6 +1,8 @@
 package com.rummgp.medical_clinic.service;
 
 import com.rummgp.medical_clinic.command.AppointmentCreateCommand;
+import com.rummgp.medical_clinic.dto.AppointmentDto;
+import com.rummgp.medical_clinic.dto.PageDto;
 import com.rummgp.medical_clinic.exception.NotFoundException;
 import com.rummgp.medical_clinic.mapper.AppointmentMapper;
 import com.rummgp.medical_clinic.model.Appointment;
@@ -11,9 +13,9 @@ import com.rummgp.medical_clinic.repository.DoctorRepository;
 import com.rummgp.medical_clinic.repository.PatientRepository;
 import com.rummgp.medical_clinic.validator.AppointmentValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +25,25 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final AppointmentMapper appointmentMapper;
 
-    public List<Appointment> findAll() {
-        return appointmentRepository.findAll();
+    public PageDto<AppointmentDto> find(Long doctorId, Long patientId, Pageable pageable) {
+        Page<Appointment> page;
+
+        if (doctorId != null && patientId != null) {
+            page = appointmentRepository.findByDoctorIdAndPatientId(doctorId, patientId, pageable);
+        } else if (doctorId != null) {
+            page = appointmentRepository.findByDoctorId(doctorId, pageable);
+        } else if (patientId != null) {
+            page = appointmentRepository.findByPatientId(patientId, pageable);
+        } else {
+            page = appointmentRepository.findAll(pageable);
+        }
+        return new PageDto<>(
+                page.map(appointmentMapper::toDto).getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 
     public Appointment add(AppointmentCreateCommand appointment) {
@@ -42,14 +61,8 @@ public class AppointmentService {
         AppointmentValidator.validateBookAppointment(appointment);
 
         Patient patient = patientRepository.findById(patientId)
-                        .orElseThrow(() -> new NotFoundException("Patient",patientId));
+                .orElseThrow(() -> new NotFoundException("Patient", patientId));
         appointment.setPatient(patient);
         return appointmentRepository.save(appointment);
-    }
-
-    public List<Appointment> findAllAppointments(Long id) {
-        patientRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Patient",id));
-        return appointmentRepository.findByPatientId(id);
     }
 }

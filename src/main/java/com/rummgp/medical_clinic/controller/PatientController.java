@@ -1,10 +1,9 @@
 package com.rummgp.medical_clinic.controller;
 
 import com.rummgp.medical_clinic.command.PatientCreateCommand;
-import com.rummgp.medical_clinic.dto.AppointmentDto;
 import com.rummgp.medical_clinic.dto.ErrorMessageDto;
+import com.rummgp.medical_clinic.dto.PageDto;
 import com.rummgp.medical_clinic.dto.PatientDto;
-import com.rummgp.medical_clinic.mapper.AppointmentMapper;
 import com.rummgp.medical_clinic.mapper.PatientMapper;
 import com.rummgp.medical_clinic.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,11 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,21 +25,18 @@ import java.util.stream.Collectors;
 public class PatientController {
     private final PatientService patientService;
     private final PatientMapper patientMapper;
-    private final AppointmentMapper appointmentMapper;
 
-    @Operation(summary = "Get all patients")
+    @Operation(summary = "Page of patients returned")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Patients list returned",
+            @ApiResponse(responseCode = "200", description = "Patients page returned",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = PatientDto.class)))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public List<PatientDto> findAll() {
-        return patientService.findAll().stream()
-                .map(patientMapper::toDto)
-                .collect(Collectors.toList());
+    public PageDto<PatientDto> findAll(Pageable pageable) {
+        return patientService.findAll(pageable);
     }
 
     @Operation(summary = "Get patient by id")
