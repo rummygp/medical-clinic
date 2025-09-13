@@ -4,11 +4,11 @@ import com.rummgp.medical_clinic.dto.InstitutionDto;
 import com.rummgp.medical_clinic.dto.PageDto;
 import com.rummgp.medical_clinic.exception.NotFoundException;
 import com.rummgp.medical_clinic.mapper.InstitutionMapper;
+import com.rummgp.medical_clinic.mapper.PageMapper;
 import com.rummgp.medical_clinic.model.Institution;
 import com.rummgp.medical_clinic.repository.InstitutionRepository;
 import com.rummgp.medical_clinic.validator.InstitutionValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +17,10 @@ import org.springframework.stereotype.Service;
 public class InstitutionService {
     private final InstitutionRepository institutionRepository;
     private final InstitutionMapper institutionMapper;
+    private final PageMapper pageMapper;
 
     public PageDto<InstitutionDto> findAll(Pageable pageable) {
-        Page<Institution> page;
-
-        page = institutionRepository.findAll(pageable);
-        return new PageDto<>(
-                page.map(institutionMapper::toDto).getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages()
-        );
+        return pageMapper.toDto(institutionRepository.findAll(pageable), institutionMapper::toDto);
     }
 
     public Institution find(Long id) {

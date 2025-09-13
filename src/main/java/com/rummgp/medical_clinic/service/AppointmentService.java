@@ -5,6 +5,7 @@ import com.rummgp.medical_clinic.dto.AppointmentDto;
 import com.rummgp.medical_clinic.dto.PageDto;
 import com.rummgp.medical_clinic.exception.NotFoundException;
 import com.rummgp.medical_clinic.mapper.AppointmentMapper;
+import com.rummgp.medical_clinic.mapper.PageMapper;
 import com.rummgp.medical_clinic.model.Appointment;
 import com.rummgp.medical_clinic.model.Doctor;
 import com.rummgp.medical_clinic.model.Patient;
@@ -24,6 +25,7 @@ public class AppointmentService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final AppointmentMapper appointmentMapper;
+    private final PageMapper pageMapper;
 
     public PageDto<AppointmentDto> find(Long doctorId, Long patientId, Pageable pageable) {
         Page<Appointment> page;
@@ -37,13 +39,7 @@ public class AppointmentService {
         } else {
             page = appointmentRepository.findAll(pageable);
         }
-        return new PageDto<>(
-                page.map(appointmentMapper::toDto).getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages()
-        );
+        return pageMapper.toDto(page, appointmentMapper::toDto);
     }
 
     public Appointment add(AppointmentCreateCommand appointment) {
