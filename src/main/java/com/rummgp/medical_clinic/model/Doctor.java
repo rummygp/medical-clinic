@@ -1,16 +1,15 @@
 package com.rummgp.medical_clinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 public class Doctor {
     @Id
@@ -34,5 +33,30 @@ public class Doctor {
         this.firstName = newData.getFirstName();
         this.lastName = newData.getLastName();
         this.specialization = newData.getSpecialization();
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", specialization='" + specialization + '\'' +
+                ", user=" + user +
+                ", institutions=" + institutions.stream().map(Institution::getId) +
+                ", patients=" + appointments.stream().map(Appointment::getPatient).map(Patient::getId) +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Doctor other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

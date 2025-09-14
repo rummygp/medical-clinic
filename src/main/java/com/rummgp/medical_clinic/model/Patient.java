@@ -45,7 +45,19 @@ public class Patient {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", birthday=" + birthday +
                 ", user=" + user +
-                ", appointments=" + appointments.stream().map(Appointment::getDoctor).map(Doctor::getId).toList() +
+                ", doctors=" + appointments.stream().map(Appointment::getDoctor).map(Doctor::getId).toList() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Patient other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
