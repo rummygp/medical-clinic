@@ -10,8 +10,6 @@ import java.util.function.Function;
 public interface PageMapper {
 
     default <E, D> PageDto<D> toDto(Page<E> page, Function<E, D> mapper) {
-        page.map(mapper).getContent();
-
         return new PageDto<>(
                 page.map(mapper).getContent(),
                 page.getNumber(),
