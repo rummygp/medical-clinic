@@ -22,10 +22,10 @@ public class Patient {
     private String idCardNo;
     private String phoneNumber;
     private LocalDate birthday;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-    @OneToMany(mappedBy = "patient")
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
 
     public void edit(Patient newData) {
@@ -45,7 +45,19 @@ public class Patient {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", birthday=" + birthday +
                 ", user=" + user +
-                ", appointments=" + appointments.stream().map(Appointment::getDoctor).map(Doctor::getId).toList() +
+                ", doctors=" + appointments.stream().map(Appointment::getDoctor).map(Doctor::getId).toList() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Patient other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

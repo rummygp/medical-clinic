@@ -1,6 +1,8 @@
 package com.rummgp.medical_clinic.repository;
 
 import com.rummgp.medical_clinic.model.Appointment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,5 +19,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             """)
     List<Appointment> findOverlapping(Long doctorId, LocalDateTime startTime, LocalDateTime endTime);
 
-    List<Appointment> findByPatientId(Long patientId);
+    Page<Appointment> findByPatientId(Long patientId, Pageable pageable);
+
+    Page<Appointment> findByDoctorId(Long doctorId, Pageable pageable);
+
+    Page<Appointment> findByDoctorIdAndPatientId(Long doctorId, Long patientId, Pageable pageable);
 }

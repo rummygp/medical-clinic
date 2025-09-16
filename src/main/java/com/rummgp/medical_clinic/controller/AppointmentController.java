@@ -3,6 +3,7 @@ package com.rummgp.medical_clinic.controller;
 import com.rummgp.medical_clinic.command.AppointmentCreateCommand;
 import com.rummgp.medical_clinic.dto.AppointmentDto;
 import com.rummgp.medical_clinic.dto.ErrorMessageDto;
+import com.rummgp.medical_clinic.dto.PageDto;
 import com.rummgp.medical_clinic.mapper.AppointmentMapper;
 import com.rummgp.medical_clinic.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,11 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,19 +27,19 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
     private final AppointmentMapper appointmentMapper;
 
-    @Operation(summary = "Get all appointments")
+    @Operation(summary = "Page of appointments returned")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Appointments list returned",
+            @ApiResponse(responseCode = "200", description = "Appointments page returned",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = AppointmentDto.class)))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public List<AppointmentDto> findAll() {
-        return appointmentService.findAll().stream()
-                .map(appointmentMapper::toDto)
-                .collect(Collectors.toList());
+    public PageDto<AppointmentDto> find(@RequestParam(required = false) Long doctorId,
+                                        @RequestParam(required = false) Long patientId,
+                                        @ParameterObject Pageable pageable) {
+        return appointmentService.find(doctorId, patientId, pageable);
     }
 
     @Operation(summary = "Add empty appointment to doctor")
@@ -85,12 +85,5 @@ public class AppointmentController {
     @PatchMapping("/{appointmentId}/patients/{patientId}")
     public AppointmentDto book(@PathVariable Long appointmentId, @PathVariable Long patientId) {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
-    }
-
-    @GetMapping("/patients/{id}")
-    public List<AppointmentDto> findAllAppointments(@PathVariable Long id){
-        return appointmentService.findAllAppointments(id).stream()
-                .map(appointmentMapper::toDto)
-                .toList();
     }
 }

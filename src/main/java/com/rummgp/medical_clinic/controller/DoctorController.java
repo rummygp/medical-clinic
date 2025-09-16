@@ -3,6 +3,7 @@ package com.rummgp.medical_clinic.controller;
 import com.rummgp.medical_clinic.command.DoctorCreateCommand;
 import com.rummgp.medical_clinic.dto.DoctorDto;
 import com.rummgp.medical_clinic.dto.ErrorMessageDto;
+import com.rummgp.medical_clinic.dto.PageDto;
 import com.rummgp.medical_clinic.mapper.DoctorMapper;
 import com.rummgp.medical_clinic.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,11 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,19 +27,17 @@ public class DoctorController {
     private final DoctorService doctorService;
     private final DoctorMapper doctorMapper;
 
-    @Operation(summary = "Get all Doctors")
+    @Operation(summary = "Page of doctors returned")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Doctors list returned",
+            @ApiResponse(responseCode = "200", description = "Doctors page returned",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = DoctorDto.class)))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public List<DoctorDto> findAll() {
-        return doctorService.findAll().stream()
-                .map(doctorMapper::toDto)
-                .collect(Collectors.toList());
+    public PageDto<DoctorDto> findAll(@ParameterObject Pageable pageable) {
+        return doctorService.findAll(pageable);
     }
 
     @Operation(summary = "Add doctor")

@@ -1,21 +1,26 @@
 package com.rummgp.medical_clinic.service;
 
+import com.rummgp.medical_clinic.dto.PageDto;
+import com.rummgp.medical_clinic.dto.UserDto;
 import com.rummgp.medical_clinic.exception.NotFoundException;
+import com.rummgp.medical_clinic.mapper.PageMapper;
+import com.rummgp.medical_clinic.mapper.UserMapper;
 import com.rummgp.medical_clinic.model.User;
 import com.rummgp.medical_clinic.repository.UserRepository;
 import com.rummgp.medical_clinic.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PageMapper pageMapper;
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public PageDto<UserDto> findAll(Pageable pageable) {
+        return pageMapper.toDto(userRepository.findAll(pageable), userMapper::toDto);
     }
 
     public User find(Long id) {
