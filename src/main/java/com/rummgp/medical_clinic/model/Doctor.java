@@ -18,15 +18,15 @@ public class Doctor {
     private String firstName;
     private String lastName;
     private String specialization;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             joinColumns = @JoinColumn(name = "doctor_id"),
             inverseJoinColumns = @JoinColumn(name = "institutions_id"))
     private List<Institution> institutions = new ArrayList<>();
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
     private List<Appointment> appointments = new ArrayList<>();
 
     public void edit(Doctor newData) {

@@ -18,10 +18,10 @@ public class Appointment {
     private Long id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_id", referencedColumnName = "id")
     private Doctor doctor;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     private Patient patient;
 

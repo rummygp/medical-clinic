@@ -21,7 +21,7 @@ public class Institution {
     private String postalCode;
     private String street;
     private String buildingNo;
-    @ManyToMany(mappedBy = "institutions")
+    @ManyToMany(mappedBy = "institutions", fetch = FetchType.EAGER)
     private List<Doctor> doctors = new ArrayList<>();
 
     public void edit(Institution newData) {
