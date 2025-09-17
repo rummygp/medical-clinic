@@ -1,0 +1,119 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: egorummy
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user_id
+              - column:
+                  name: email
+                  type: varchar(50)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_user_email
+              - column:
+                  name: username
+                  type: varchar(50)
+              - column:
+                  name: password
+                  type: varchar(50)
+        - createTable:
+            tableName: patient
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_patient_id
+              - column:
+                  name: firstName
+                  type: varchar(30)
+              - column:
+                  name: lastName
+                  type: varchar(50)
+              - column:
+                  name: idCardNo
+                  type: varchar(30)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_patient_idCardNo
+              - column:
+                  name: phoneNumber
+                  type: varchar(15)
+              - column:
+                  name: birthday
+                  type: date
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_patient_user
+        - addForeignKeyConstraint:
+            baseTableName: patient
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_patient_user
+        - createTable:
+            tableName: doctor
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_doctor_id
+              - column:
+                  name: firstName
+                  type: varchar(30)
+              - column:
+                  name: lastName
+                  type: varchar(50)
+              - column:
+                  name: specialization
+                  type: varchar(50)
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_doctor_user
+        - addForeignKeyConstraint:
+            baseTableName: doctor
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_doctor_user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
