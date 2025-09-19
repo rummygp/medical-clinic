@@ -38,19 +38,19 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: pk_patient_id
               - column:
-                  name: firstName
+                  name: first_name
                   type: varchar(30)
               - column:
-                  name: lastName
+                  name: last_name
                   type: varchar(50)
               - column:
-                  name: idCardNo
+                  name: card_number_id
                   type: varchar(30)
                   constraints:
                     unique: true
-                    uniqueConstraintName: uq_patient_idCardNo
+                    uniqueConstraintName: uq_patient_card_number_id
               - column:
-                  name: phoneNumber
+                  name: phone_number
                   type: varchar(15)
               - column:
                   name: birthday
@@ -79,10 +79,10 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: pk_doctor_id
               - column:
-                  name: firstName
+                  name: first_name
                   type: varchar(30)
               - column:
-                  name: lastName
+                  name: last_name
                   type: varchar(50)
               - column:
                   name: specialization

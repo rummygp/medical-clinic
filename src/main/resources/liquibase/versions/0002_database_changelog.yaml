@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: egorummy
+      changes:
+        - createTable:
+            tableName: institution
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_institution_id
+              - column:
+                  name: name
+                  type: varchar(50)
+              - column:
+                  name: city
+                  type: varchar(50)
+              - column:
+                  name: postal_code
+                  type: varchar(20)
+              - column:
+                  name: street
+                  type: varchar(50)
+              - column:
+                  name: building_no
+                  type: varchar(50)
+        - createTable:
+            tableName: doctor_institutions
+            columns:
+              - column:
+                  name: doctor_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: institutions_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: doctor_institutions
+            columnNames: doctor_id, institutions_id
+            constraintName: pk_doctor_institution
+        - addForeignKeyConstraint:
+            baseTableName: doctor_institutions
+            baseColumnNames: doctor_id
+            referencedTableName: doctor
+            referencedColumnNames: id
+            constraintName: fk_doctor_institution_doctor_id
+        - addForeignKeyConstraint:
+            baseTableName: doctor_institutions
+            baseColumnNames: institutions_id
+            referencedTableName: institution
+            referencedColumnNames: id
+            constraintName: fk_institution_id
+
+
+
