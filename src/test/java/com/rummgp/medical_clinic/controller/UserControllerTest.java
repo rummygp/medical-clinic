@@ -35,13 +35,22 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldReturnUsersWhenDataCorrect() throws Exception {
-        UserDto userDto1 = UserDto.builder().id(1L).username("username1").email("email1").build();
-        UserDto userDto2 = UserDto.builder().id(2L).username("username2").email("email2").build();
+    void shouldReturnUserDtosWhenDataCorrect() throws Exception {
+        UserDto userDto1 = UserDto.builder()
+                .id(1L)
+                .username("username1")
+                .email("email1")
+                .build();
+        UserDto userDto2 = UserDto.builder()
+                .id(2L)
+                .username("username2")
+                .email("email2")
+                .build();
         Pageable pageable = PageRequest.of(0, 2);
         PageDto<UserDto> page = new PageDto<>(List.of(userDto1, userDto2), pageable.getPageNumber(), pageable.getPageSize(), 2, 1);
 
         when(userService.findAll(pageable)).thenReturn(page);
+
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -60,10 +69,16 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturnUserWhenDataCorrect() throws Exception {
-        User user = User.builder().id(1L).username("userUsername").email("userEmail").password("userPassword").build();
+    void shouldReturnUserDtoWhenDataCorrect() throws Exception {
+        User user = User.builder()
+                .id(1L)
+                .username("userUsername")
+                .email("userEmail")
+                .password("userPassword")
+                .build();
 
         when(userService.find(user.getId())).thenReturn(user);
+
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +106,9 @@ public class UserControllerTest {
                 .email("userEmail")
                 .password("userPassword")
                 .build();
+
         when(userService.add(any(User.class))).thenReturn(user);
+
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -107,7 +124,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldReturnUserDtoWhenPasswordChanged() throws Exception {
+    void shouldReturnUserDtoWhenValidNewPasswordAndIdProvided() throws Exception {
         Long userId = 1L;
         User user = User.builder()
                 .id(1L)
@@ -116,7 +133,9 @@ public class UserControllerTest {
                 .password("newPassword")
                 .build();
         ChangePasswordCommand changePasswordCommand = ChangePasswordCommand.builder().password("newPassword").build();
+
         when(userService.changePassword(userId, changePasswordCommand.password())).thenReturn(user);
+
         mockMvc.perform(
                 MockMvcRequestBuilders.patch("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)

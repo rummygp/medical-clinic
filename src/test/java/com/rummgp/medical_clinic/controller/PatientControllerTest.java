@@ -42,7 +42,7 @@ public class PatientControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldReturnPatientsWhenDataCorrect() throws Exception {
+    void shouldReturnPatientDtosWhenDataCorrect() throws Exception {
         UserDto userDto1 = UserDto.builder().id(1L).build();
         UserDto userDto2 = UserDto.builder().id(2L).build();
         PatientDto patientDto1 = PatientDto.builder()
@@ -88,7 +88,7 @@ public class PatientControllerTest {
     }
 
     @Test
-    void shouldReturnPatientWhenDataCorrect() throws Exception {
+    void shouldReturnPatientDtoWhenDataCorrect() throws Exception {
         User user = User.builder().id(1L).build();
         Patient patient = Patient.builder()
                 .id(2L)
@@ -164,7 +164,7 @@ public class PatientControllerTest {
     }
 
     @Test
-    void shouldDeletePatientWhenIdProvided() throws Exception {
+    void shouldDeletePatientDtoWhenIdProvided() throws Exception {
         mockMvc.perform(
                         MockMvcRequestBuilders.delete("/patients/1")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -177,7 +177,7 @@ public class PatientControllerTest {
     }
 
     @Test
-    void shouldEditAndReturnPatientDtoWhenDataCorrect() throws Exception {
+    void shouldEditAndReturnPatientDtoWhenValidDataProvided() throws Exception {
         User user = User.builder().id(1L).build();
         UserCreateCommand inputUser = UserCreateCommand.builder().id(1L).build();
         PatientCreateCommand inputPatient = PatientCreateCommand.builder()
@@ -217,6 +217,7 @@ public class PatientControllerTest {
                         jsonPath("$.user.id").value(1L),
                         jsonPath("$.appointmentsId", hasSize(0))
                 );
+
         verify(patientService).edit(eq(2L), any(Patient.class));
     }
 }

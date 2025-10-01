@@ -22,7 +22,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +50,18 @@ public class DoctorServiceTest {
     @Test
     void findAll_DataCorrect_DoctorsReturned() {
         // given
-        User user1 = User.builder().id(1L).email("email").username("username").password("password").build();
-        User user2 = User.builder().id(2L).email("email2").username("username2").password("password2").build();
+        User user1 = User.builder()
+                .id(1L)
+                .email("email")
+                .username("username")
+                .password("password")
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .email("email2")
+                .username("username2")
+                .password("password2")
+                .build();
         Doctor doctor1 = Doctor.builder()
                 .id(1L)
                 .firstName("name1")
@@ -71,10 +80,10 @@ public class DoctorServiceTest {
                 .institutions(new ArrayList<>())
                 .appointments(new ArrayList<>())
                 .build();
-
         List<Doctor> doctors = List.of(doctor1, doctor2);
         Pageable pageable = PageRequest.of(0, 2);
         Page<Doctor> page = new PageImpl<>(doctors, pageable, doctors.size());
+
         when(doctorRepository.findAll(pageable)).thenReturn(page);
         //when
         PageDto<DoctorDto> result = doctorService.findAll(pageable);
@@ -89,7 +98,6 @@ public class DoctorServiceTest {
                 () -> assertEquals("username", result.content().get(0).user().username()),
                 () -> assertTrue(result.content().get(0).institutionsId().isEmpty()),
                 () -> assertTrue(result.content().get(0).appointmentsId().isEmpty()),
-
                 () -> assertEquals(2L, result.content().get(1).id()),
                 () -> assertEquals("name2", result.content().get(1).firstName()),
                 () -> assertEquals("lastName2", result.content().get(1).lastName()),
@@ -105,7 +113,12 @@ public class DoctorServiceTest {
     @Test
     void find_DataCorrect_DoctorReturned() {
         //given
-        User user = User.builder().id(1L).email("email").username("username").password("password").build();
+        User user = User.builder()
+                .id(1L)
+                .email("email")
+                .username("username")
+                .password("password")
+                .build();
         Doctor doctor = Doctor.builder()
                 .id(1L)
                 .firstName("name")
@@ -115,6 +128,7 @@ public class DoctorServiceTest {
                 .institutions(new ArrayList<>())
                 .appointments(new ArrayList<>())
                 .build();
+
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
         //when
         Doctor result = doctorService.find(1L);
@@ -134,6 +148,7 @@ public class DoctorServiceTest {
 
     @Test
     void find_DoctorNotFound_ExceptionThrown() {
+
         when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> doctorService.find(1L));
@@ -165,7 +180,6 @@ public class DoctorServiceTest {
                 .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
         when(doctorRepository.save(doctor)).thenReturn(doctor);
         //when
         Doctor result1 = doctorService.add(doctor);
@@ -182,6 +196,7 @@ public class DoctorServiceTest {
                 () -> assertTrue(result1.getInstitutions().isEmpty()),
                 () -> assertTrue(result1.getAppointments().isEmpty())
         );
+
         verify(userRepository).findById(1L);
     }
 
@@ -318,7 +333,6 @@ public class DoctorServiceTest {
                 .build();
 
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
-
         when(doctorRepository.save(doctor)).thenReturn(doctor);
         //when
         Doctor result = doctorService.update(1L, updatedDoctor);
@@ -411,9 +425,7 @@ public class DoctorServiceTest {
                 .build();
 
         when(doctorRepository.findById(2L)).thenReturn(Optional.of(doctor));
-
         when(institutionRepository.findById(3L)).thenReturn(Optional.of(institution));
-
         when(doctorRepository.save(doctor)).thenReturn(doctor);
         //when
         Doctor result = doctorService.assignInstitutionToDoctor(2L, 3L);
@@ -431,9 +443,7 @@ public class DoctorServiceTest {
         );
 
         verify(doctorRepository).findById(any(Long.class));
-
         verify(institutionRepository).findById(any(Long.class));
-
         verify(doctorRepository).save(any(Doctor.class));
     }
 
@@ -473,7 +483,6 @@ public class DoctorServiceTest {
         Long institutionId = 3L;
 
         when(doctorRepository.findById(2L)).thenReturn(Optional.of(doctor));
-
         when(institutionRepository.findById(3L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class, () -> doctorService.assignInstitutionToDoctor(2L, 3L));

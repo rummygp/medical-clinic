@@ -22,7 +22,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -232,7 +231,6 @@ public class AppointmentServiceTest {
                 .build();
 
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
-
         when(appointmentRepository.save(any(Appointment.class))).then(returnsFirstArg());
         //when
         Appointment result = appointmentService.add(appointmentCreateCommand);
@@ -337,7 +335,6 @@ public class AppointmentServiceTest {
         List<Appointment> appointments = List.of(appointment);
 
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
-
         when(appointmentRepository.findOverlapping(1L, LocalDateTime.of(3025, 9, 29, 10, 0), LocalDateTime.of(3025, 9, 29, 10, 30)))
                 .thenReturn(appointments);
         //when
@@ -367,9 +364,7 @@ public class AppointmentServiceTest {
                 .build();
 
         when(appointmentRepository.findById(3L)).thenReturn(Optional.of(appointment));
-
         when(patientRepository.findById(2L)).thenReturn(Optional.of(patient));
-
         when(appointmentRepository.save(appointment)).thenReturn(appointment);
         //when
         Appointment result = appointmentService.bookAppointment(3L, 2L);
@@ -421,7 +416,6 @@ public class AppointmentServiceTest {
                 .build();
 
         when(appointmentRepository.findById(3L)).thenReturn(Optional.of(appointment));
-
         when(patientRepository.findById(patientId)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class,
@@ -442,7 +436,6 @@ public class AppointmentServiceTest {
         //given
         Doctor doctor = Doctor.builder().id(1L).build();
         Patient patient1 = Patient.builder().id(2L).build();
-        Long patient2Id = 3L;
         Appointment appointment = Appointment.builder()
                 .id(4L)
                 .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))

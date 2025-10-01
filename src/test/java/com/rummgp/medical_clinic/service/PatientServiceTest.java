@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +99,6 @@ public class PatientServiceTest {
                 () -> assertEquals("email1", result.content().get(0).user().email()),
                 () -> assertEquals("username1", result.content().get(0).user().username()),
                 () -> assertTrue(result.content().get(0).appointmentsId().isEmpty()),
-
                 () -> assertEquals(2L, result.content().get(1).id()),
                 () -> assertEquals("firstName2", result.content().get(1).firstName()),
                 () -> assertEquals("lastName2", result.content().get(1).lastName()),
@@ -194,7 +192,6 @@ public class PatientServiceTest {
                 .build();
 
         when(patientRepository.save(patient)).thenReturn(patient);
-
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         //when
         Patient result = patientService.add(patient);
@@ -264,7 +261,6 @@ public class PatientServiceTest {
         );
 
         verify(userRepository, never()).findById(1L);
-
         verify(patientRepository).save(any());
     }
 
@@ -310,7 +306,6 @@ public class PatientServiceTest {
         );
 
         verify(userRepository).findById(1L);
-
         verify(patientRepository,never()).save(any());
     }
 
@@ -324,7 +319,6 @@ public class PatientServiceTest {
         patientService.delete(1L);
         //then
         verify(patientRepository).findById(1L);
-
         verify(patientRepository).delete(patient);
     }
 
@@ -344,7 +338,6 @@ public class PatientServiceTest {
         );
 
         verify(patientRepository).findById(patientId);
-
         verify(patientRepository, never()).delete(any());
     }
 
@@ -376,7 +369,6 @@ public class PatientServiceTest {
                 .build();
 
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-
         when(patientRepository.save(patient)).thenReturn(patient);
         //when
         Patient result = patientService.edit(1L, updatedPatient);
@@ -396,7 +388,6 @@ public class PatientServiceTest {
         );
 
         verify(patientRepository).findById(1L);
-
         verify(patientRepository).save(patient);
     }
 
@@ -419,7 +410,6 @@ public class PatientServiceTest {
         );
 
         verify(patientRepository).findById(1L);
-
         verify(patientRepository, never()).save(any());
     }
 
@@ -455,7 +445,6 @@ public class PatientServiceTest {
         );
 
         verify(patientRepository).findById(1L);
-
         verify(patientRepository, never()).save(any());
     }
 
@@ -497,7 +486,6 @@ public class PatientServiceTest {
         );
 
         verify(patientRepository).findById(1L);
-
         verify(patientRepository, never()).save(any());
     }
 }

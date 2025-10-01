@@ -58,6 +58,3 @@ databaseChangeLog:
             referencedTableName: institution
             referencedColumnNames: id
             constraintName: fk_institution_id
-
-
-

@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +78,6 @@ public class InstitutionServiceTest {
                 () -> assertEquals("Street 1", result.content().get(0).street()),
                 () -> assertEquals("111", result.content().get(0).buildingNo()),
                 () -> assertTrue(result.content().get(0).doctorsId().isEmpty()),
-
                 () -> assertEquals(2L, result.content().get(1).id()),
                 () -> assertEquals("Institution 2", result.content().get(1).name()),
                 () -> assertEquals("City 2", result.content().get(1).city()),
@@ -260,7 +258,6 @@ public class InstitutionServiceTest {
                 .build();
 
         when(institutionRepository.findById(1L)).thenReturn(Optional.of(institution));
-
         when(institutionRepository.save(institution)).thenReturn(institution);
         //when
         Institution result = institutionService.update(1L, updatedInstitution);
@@ -295,7 +292,6 @@ public class InstitutionServiceTest {
         );
 
         verify(institutionRepository, never()).findById(any());
-
         verify(institutionRepository, never()).save(any());
     }
 
@@ -329,7 +325,6 @@ public class InstitutionServiceTest {
         );
 
         verify(institutionRepository).findById(1L);
-
         verify(institutionRepository, never()).save(any());
     }
 }

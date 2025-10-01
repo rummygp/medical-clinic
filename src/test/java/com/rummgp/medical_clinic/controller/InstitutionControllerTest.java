@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rummgp.medical_clinic.command.InstitutionCreateCommand;
 import com.rummgp.medical_clinic.dto.InstitutionDto;
 import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.dto.PatientDto;
 import com.rummgp.medical_clinic.model.Institution;
 import com.rummgp.medical_clinic.service.InstitutionService;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +36,7 @@ public class InstitutionControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldReturnInstitutionsWhenDataCorrect() throws Exception {
+    void shouldReturnInstitutionDtosWhenDataCorrect() throws Exception {
         InstitutionDto institutionDto1 = InstitutionDto.builder()
                 .id(1L)
                 .name("institutionName1")
@@ -82,7 +80,7 @@ public class InstitutionControllerTest {
     }
 
     @Test
-    void shouldSaveAndReturnInstitutionWhenDataCorrect() throws Exception {
+    void shouldSaveAndReturnInstitutionDtoWhenDataCorrect() throws Exception {
         InstitutionCreateCommand inputInstitution = InstitutionCreateCommand.builder()
                 .name("institutionName")
                 .city("institutionCity")

@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -67,7 +66,6 @@ public class UserServiceTest {
                 () -> assertEquals(1L, result.content().get(0).id()),
                 () -> assertEquals("userUsername1", result.content().get(0).username()),
                 () -> assertEquals("userEmail1", result.content().get(0).email()),
-
                 () -> assertEquals(2L, result.content().get(1).id()),
                 () -> assertEquals("userUsername2", result.content().get(1).username()),
                 () -> assertEquals("userEmail2", result.content().get(1).email())
@@ -101,8 +99,9 @@ public class UserServiceTest {
 
     @Test
     void find_UserNotFound_ExceptionThrown() {
-        Long userId = 1L;
         //given
+        Long userId = 1L;
+
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class, () -> userService.find(1L));
@@ -191,7 +190,6 @@ public class UserServiceTest {
                 .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-
         when(userRepository.save(user)).thenReturn(user);
         //when
         User result = userService.changePassword(1L, newPassword);
@@ -221,7 +219,6 @@ public class UserServiceTest {
         );
 
         verify(userRepository, never()).findById(any());
-
         verify(userRepository, never()).save(any());
     }
 
@@ -242,7 +239,6 @@ public class UserServiceTest {
         );
 
         verify(userRepository).findById(any());
-
         verify(userRepository, never()).save(any());
     }
 }
