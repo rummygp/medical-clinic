@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: egorummy
+      changes:
+        - createTable:
+            tableName: appointment
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_appointment_id
+              - column:
+                  name: start_time
+                  type: datetime
+              - column:
+                  name: end_time
+                  type: datetime
+              - column:
+                  name: doctor_id
+                  type: bigint
+              - column:
+                  name: patient_id
+                  type: bigint
+        - addForeignKeyConstraint:
+            baseTableName: appointment
+            baseColumnNames: doctor_id
+            referencedTableName: doctor
+            referencedColumnNames: id
+            constraintName: fk_appointment_doctor_id
+        - addForeignKeyConstraint:
+            baseTableName: appointment
+            baseColumnNames: patient_id
+            referencedTableName: patient
+            referencedColumnNames: id
+            constraintName: fk_appointment_patient_id

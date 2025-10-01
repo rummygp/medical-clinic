@@ -55,7 +55,6 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new NotFoundException("Appointment", appointmentId));
         AppointmentValidator.validateBookAppointment(appointment);
-
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new NotFoundException("Patient", patientId));
         appointment.setPatient(patient);
