@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Mockito.*;
 
 public class AppointmentServiceTest {
@@ -232,7 +233,7 @@ public class AppointmentServiceTest {
 
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
 
-        when(appointmentRepository.save(any(Appointment.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(appointmentRepository.save(any(Appointment.class))).then(returnsFirstArg());
         //when
         Appointment result = appointmentService.add(appointmentCreateCommand);
         //then
