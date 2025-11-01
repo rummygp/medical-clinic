@@ -10,10 +10,12 @@ import com.rummgp.medical_clinic.model.Institution;
 import com.rummgp.medical_clinic.repository.DoctorRepository;
 import com.rummgp.medical_clinic.repository.InstitutionRepository;
 import com.rummgp.medical_clinic.repository.UserRepository;
+import com.rummgp.medical_clinic.repository.specification.DoctorSpecification;
 import com.rummgp.medical_clinic.validator.DoctorValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -25,8 +27,14 @@ public class DoctorService {
     private final DoctorMapper doctorMapper;
     private final PageMapper pageMapper;
 
-    public PageDto<DoctorDto> findAll(Pageable pageable) {
-        return pageMapper.toDto(doctorRepository.findAll(pageable), doctorMapper::toDto);
+    public PageDto<DoctorDto> find(String specialization, Pageable pageable) {
+        Specification<Doctor> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+
+        if (specialization != null) {
+            spec = spec.and(DoctorSpecification.hasSpecialization(specialization));
+        }
+
+        return pageMapper.toDto(doctorRepository.findAll(spec, pageable), doctorMapper::toDto);
     }
 
     public Doctor find(Long id) {

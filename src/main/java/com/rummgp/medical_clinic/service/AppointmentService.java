@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -30,18 +31,14 @@ public class AppointmentService {
     private final AppointmentMapper appointmentMapper;
     private final PageMapper pageMapper;
 
-    public PageDto<AppointmentDto> find(Long doctorId, Long patientId, Pageable pageable) {
-        Page<Appointment> page;
-
-        if (doctorId != null && patientId != null) {
-            page = appointmentRepository.findByDoctorIdAndPatientId(doctorId, patientId, pageable);
-        } else if (doctorId != null) {
-            page = appointmentRepository.findByDoctorId(doctorId, pageable);
-        } else if (patientId != null) {
-            page = appointmentRepository.findByPatientId(patientId, pageable);
-        } else {
-            page = appointmentRepository.findAll(pageable);
-        }
+    public PageDto<AppointmentDto> find(Long doctorId, Long patientId, String specialization, LocalDate date,
+                                                 LocalDateTime intervalStart, LocalDateTime intervalEnd, Pageable pageable) {
+        doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new NotFoundException("Doctor", doctorId));
+        patientRepository.findById(patientId)
+                .orElseThrow(() -> new NotFoundException("Patient", patientId));
+        Specification<Appointment> spec = filter(doctorId, patientId, specialization, date, intervalStart, intervalEnd);
+        Page<Appointment> page = appointmentRepository.findAll(spec, pageable);
         return pageMapper.toDto(page, appointmentMapper::toDto);
     }
 
@@ -64,9 +61,15 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
-    public PageDto<AppointmentDto> findAvailable(Long doctorId, String specialization, LocalDate date, Pageable pageable) {
+    public void delete(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Appointment", id));
+        appointmentRepository.delete(appointment);
+    }
 
-        Specification<Appointment> spec = AppointmentSpecification.isAvailable();
+    private Specification<Appointment> filter(Long doctorId, Long patientId, String specialization, LocalDate date,
+                                              LocalDateTime intervalStart, LocalDateTime intervalEnd) {
+        Specification<Appointment> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
 
         if (doctorId != null) {
             spec = spec.and((AppointmentSpecification.hasDoctor(doctorId)));
@@ -80,7 +83,16 @@ public class AppointmentService {
             spec = spec.and(AppointmentSpecification.isOnDate(date));
         }
 
-        Page<Appointment> page = appointmentRepository.findAll(spec, pageable);
-        return pageMapper.toDto(page, appointmentMapper::toDto);
+        if (intervalStart != null && intervalEnd != null && intervalStart.isBefore(intervalEnd)) {
+            spec = spec.and(AppointmentSpecification.overlapsInterval(intervalStart, intervalEnd));
+        }
+
+        if (patientId != null) {
+            spec = spec.and(AppointmentSpecification.hasPatient(patientId));
+        } else {
+            spec = spec.and(AppointmentSpecification.isAvailable());
+        }
+
+        return spec;
     }
 }

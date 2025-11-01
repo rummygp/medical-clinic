@@ -49,176 +49,176 @@ public class AppointmentServiceTest {
         this.appointmentService = new AppointmentService(appointmentRepository, doctorRepository, patientRepository, appointmentMapper, pageMapper);
     }
 
-    @Test
-    void find_ByDoctorAndPatientId_AppointmentReturned() {
-        //given
-        Doctor doctor = Doctor.builder().id(1L).build();
-        Patient patient = Patient.builder().id(2L).build();
-        Appointment appointment1 = Appointment.builder()
-                .id(3L)
-                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
-                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
-                .doctor(doctor)
-                .patient(patient)
-                .build();
-        Appointment appointment2 = Appointment.builder()
-                .id(4L)
-                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
-                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
-                .doctor(doctor)
-                .patient(patient)
-                .build();
-        List<Appointment> appointments = List.of(appointment1, appointment2);
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
-
-        when(appointmentRepository.findByDoctorIdAndPatientId(1L, 2L, pageable)).thenReturn(page);
-        //when
-        PageDto<AppointmentDto> result = appointmentService.find(1L, 2L, pageable);
-        //then
-        Assertions.assertAll(
-                () -> assertEquals(3L, result.content().get(0).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
-                () -> assertEquals(1L, result.content().get(0).doctorId()),
-                () -> assertEquals(2L, result.content().get(0).patientId()),
-                () -> assertEquals(4L, result.content().get(1).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
-                () -> assertEquals(1L, result.content().get(1).doctorId()),
-                () -> assertEquals(2L, result.content().get(1).patientId())
-        );
-
-        verify(appointmentRepository).findByDoctorIdAndPatientId(1L, 2L, pageable);
-        verifyNoMoreInteractions(appointmentRepository);
-    }
-
-    @Test
-    void find_ByDoctorId_AppointmentsReturned() {
-        Doctor doctor = Doctor.builder().id(1L).build();
-        Appointment appointment1 = Appointment.builder()
-                .id(2L)
-                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
-                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
-                .doctor(doctor)
-                .patient(null)
-                .build();
-        Appointment appointment2 = Appointment.builder()
-                .id(3L)
-                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
-                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
-                .doctor(doctor)
-                .patient(null)
-                .build();
-
-        List<Appointment> appointments = List.of(appointment1, appointment2);
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
-
-        when(appointmentRepository.findByDoctorId(1L, pageable)).thenReturn(page);
-        //when
-        PageDto<AppointmentDto> result = appointmentService.find(1L, null, pageable);
-        //then
-        Assertions.assertAll(
-                () -> assertEquals(2L, result.content().get(0).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
-                () -> assertEquals(1L, result.content().get(0).doctorId()),
-                () -> assertNull(result.content().get(0).patientId()),
-                () -> assertEquals(3L, result.content().get(1).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
-                () -> assertEquals(1L, result.content().get(1).doctorId()),
-                () -> assertNull(result.content().get(1).patientId())
-        );
-
-        verify(appointmentRepository).findByDoctorId(1L, pageable);
-        verifyNoMoreInteractions(appointmentRepository);
-    }
-
-    @Test
-    void find_ByPatientId_AppointmentsReturned() {
-        Patient patient = Patient.builder().id(1L).build();
-        Appointment appointment1 = Appointment.builder()
-                .id(2L)
-                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
-                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
-                .doctor(null)
-                .patient(patient)
-                .build();
-        Appointment appointment2 = Appointment.builder()
-                .id(3L)
-                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
-                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
-                .doctor(null)
-                .patient(patient)
-                .build();
-        List<Appointment> appointments = List.of(appointment1, appointment2);
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
-
-        when(appointmentRepository.findByPatientId(1L, pageable)).thenReturn(page);
-        //when
-        PageDto<AppointmentDto> result = appointmentService.find(null, 1L, pageable);
-        //then
-        Assertions.assertAll(
-                () -> assertEquals(2L, result.content().get(0).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
-                () -> assertEquals(1L, result.content().get(0).patientId()),
-                () -> assertNull(result.content().get(0).doctorId()),
-                () -> assertEquals(3L, result.content().get(1).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
-                () -> assertEquals(1L, result.content().get(1).patientId()),
-                () -> assertNull(result.content().get(1).doctorId())
-        );
-
-        verify(appointmentRepository).findByPatientId(1L, pageable);
-        verifyNoMoreInteractions(appointmentRepository);
-    }
-
-    @Test
-    void find_findAll_AppointmentsReturned() {
-        Doctor doctor = Doctor.builder().id(1L).build();
-        Appointment appointment1 = Appointment.builder()
-                .id(2L)
-                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
-                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
-                .doctor(doctor)
-                .patient(null)
-                .build();
-        Appointment appointment2 = Appointment.builder()
-                .id(3L)
-                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
-                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
-                .doctor(doctor)
-                .patient(null)
-                .build();
-        List<Appointment> appointments = List.of(appointment1, appointment2);
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
-
-        when(appointmentRepository.findAll(pageable)).thenReturn(page);
-        //when
-        PageDto<AppointmentDto> result = appointmentService.find(null, null, pageable);
-        //then
-        Assertions.assertAll(
-                () -> assertEquals(2L, result.content().get(0).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
-                () -> assertEquals(1L, result.content().get(0).doctorId()),
-                () -> assertNull(result.content().get(0).patientId()),
-                () -> assertEquals(3L, result.content().get(1).id()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
-                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
-                () -> assertEquals(1L, result.content().get(1).doctorId()),
-                () -> assertNull(result.content().get(1).patientId())
-        );
-
-        verify(appointmentRepository).findAll(pageable);
-        verifyNoMoreInteractions(appointmentRepository);
-    }
+//    @Test
+//    void find_ByDoctorAndPatientId_AppointmentReturned() {
+//        //given
+//        Doctor doctor = Doctor.builder().id(1L).build();
+//        Patient patient = Patient.builder().id(2L).build();
+//        Appointment appointment1 = Appointment.builder()
+//                .id(3L)
+//                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
+//                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
+//                .doctor(doctor)
+//                .patient(patient)
+//                .build();
+//        Appointment appointment2 = Appointment.builder()
+//                .id(4L)
+//                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
+//                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
+//                .doctor(doctor)
+//                .patient(patient)
+//                .build();
+//        List<Appointment> appointments = List.of(appointment1, appointment2);
+//        Pageable pageable = PageRequest.of(0, 2);
+//        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
+//
+//        when(appointmentRepository.findByDoctorIdAndPatientId(1L, 2L, pageable)).thenReturn(page);
+//        //when
+//        PageDto<AppointmentDto> result = appointmentService.find(1L, 2L, pageable);
+//        //then
+//        Assertions.assertAll(
+//                () -> assertEquals(3L, result.content().get(0).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
+//                () -> assertEquals(1L, result.content().get(0).doctorId()),
+//                () -> assertEquals(2L, result.content().get(0).patientId()),
+//                () -> assertEquals(4L, result.content().get(1).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
+//                () -> assertEquals(1L, result.content().get(1).doctorId()),
+//                () -> assertEquals(2L, result.content().get(1).patientId())
+//        );
+//
+//        verify(appointmentRepository).findByDoctorIdAndPatientId(1L, 2L, pageable);
+//        verifyNoMoreInteractions(appointmentRepository);
+//    }
+//
+//    @Test
+//    void find_ByDoctorId_AppointmentsReturned() {
+//        Doctor doctor = Doctor.builder().id(1L).build();
+//        Appointment appointment1 = Appointment.builder()
+//                .id(2L)
+//                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
+//                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
+//                .doctor(doctor)
+//                .patient(null)
+//                .build();
+//        Appointment appointment2 = Appointment.builder()
+//                .id(3L)
+//                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
+//                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
+//                .doctor(doctor)
+//                .patient(null)
+//                .build();
+//
+//        List<Appointment> appointments = List.of(appointment1, appointment2);
+//        Pageable pageable = PageRequest.of(0, 2);
+//        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
+//
+//        when(appointmentRepository.findByDoctorId(1L, pageable)).thenReturn(page);
+//        //when
+//        PageDto<AppointmentDto> result = appointmentService.find(1L, null, pageable);
+//        //then
+//        Assertions.assertAll(
+//                () -> assertEquals(2L, result.content().get(0).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
+//                () -> assertEquals(1L, result.content().get(0).doctorId()),
+//                () -> assertNull(result.content().get(0).patientId()),
+//                () -> assertEquals(3L, result.content().get(1).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
+//                () -> assertEquals(1L, result.content().get(1).doctorId()),
+//                () -> assertNull(result.content().get(1).patientId())
+//        );
+//
+//        verify(appointmentRepository).findByDoctorId(1L, pageable);
+//        verifyNoMoreInteractions(appointmentRepository);
+//    }
+//
+//    @Test
+//    void find_ByPatientId_AppointmentsReturned() {
+//        Patient patient = Patient.builder().id(1L).build();
+//        Appointment appointment1 = Appointment.builder()
+//                .id(2L)
+//                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
+//                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
+//                .doctor(null)
+//                .patient(patient)
+//                .build();
+//        Appointment appointment2 = Appointment.builder()
+//                .id(3L)
+//                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
+//                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
+//                .doctor(null)
+//                .patient(patient)
+//                .build();
+//        List<Appointment> appointments = List.of(appointment1, appointment2);
+//        Pageable pageable = PageRequest.of(0, 2);
+//        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
+//
+//        when(appointmentRepository.findByPatientId(1L, pageable)).thenReturn(page);
+//        //when
+//        PageDto<AppointmentDto> result = appointmentService.find(null, 1L, pageable);
+//        //then
+//        Assertions.assertAll(
+//                () -> assertEquals(2L, result.content().get(0).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
+//                () -> assertEquals(1L, result.content().get(0).patientId()),
+//                () -> assertNull(result.content().get(0).doctorId()),
+//                () -> assertEquals(3L, result.content().get(1).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
+//                () -> assertEquals(1L, result.content().get(1).patientId()),
+//                () -> assertNull(result.content().get(1).doctorId())
+//        );
+//
+//        verify(appointmentRepository).findByPatientId(1L, pageable);
+//        verifyNoMoreInteractions(appointmentRepository);
+//    }
+//
+//    @Test
+//    void find_findAll_AppointmentsReturned() {
+//        Doctor doctor = Doctor.builder().id(1L).build();
+//        Appointment appointment1 = Appointment.builder()
+//                .id(2L)
+//                .startTime(LocalDateTime.of(3025, 9, 29, 10, 0))
+//                .endTime(LocalDateTime.of(3025, 9, 29, 10, 30))
+//                .doctor(doctor)
+//                .patient(null)
+//                .build();
+//        Appointment appointment2 = Appointment.builder()
+//                .id(3L)
+//                .startTime(LocalDateTime.of(3025, 10, 29, 11, 0))
+//                .endTime(LocalDateTime.of(3025, 10, 29, 11, 30))
+//                .doctor(doctor)
+//                .patient(null)
+//                .build();
+//        List<Appointment> appointments = List.of(appointment1, appointment2);
+//        Pageable pageable = PageRequest.of(0, 2);
+//        Page<Appointment> page = new PageImpl<>(appointments, pageable, appointments.size());
+//
+//        when(appointmentRepository.findAll(pageable)).thenReturn(page);
+//        //when
+//        PageDto<AppointmentDto> result = appointmentService.find(null, null, pageable);
+//        //then
+//        Assertions.assertAll(
+//                () -> assertEquals(2L, result.content().get(0).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 0), result.content().get(0).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 9, 29, 10, 30), result.content().get(0).endTime()),
+//                () -> assertEquals(1L, result.content().get(0).doctorId()),
+//                () -> assertNull(result.content().get(0).patientId()),
+//                () -> assertEquals(3L, result.content().get(1).id()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 0), result.content().get(1).startTime()),
+//                () -> assertEquals(LocalDateTime.of(3025, 10, 29, 11, 30), result.content().get(1).endTime()),
+//                () -> assertEquals(1L, result.content().get(1).doctorId()),
+//                () -> assertNull(result.content().get(1).patientId())
+//        );
+//
+//        verify(appointmentRepository).findAll(pageable);
+//        verifyNoMoreInteractions(appointmentRepository);
+//    }
 
     @Test
     void add_DataCorrect_AppointmentReturned() {

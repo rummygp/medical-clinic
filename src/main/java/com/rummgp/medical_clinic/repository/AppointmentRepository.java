@@ -19,10 +19,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
             and v.endTime > :startTime
             """)
     List<Appointment> findOverlapping(Long doctorId, LocalDateTime startTime, LocalDateTime endTime);
-
-    Page<Appointment> findByPatientId(Long patientId, Pageable pageable);
-
-    Page<Appointment> findByDoctorId(Long doctorId, Pageable pageable);
-
-    Page<Appointment> findByDoctorIdAndPatientId(Long doctorId, Long patientId, Pageable pageable);
 }

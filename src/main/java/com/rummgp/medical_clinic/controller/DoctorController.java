@@ -36,8 +36,9 @@ public class DoctorController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
-    public PageDto<DoctorDto> findAll(@ParameterObject Pageable pageable) {
-        return doctorService.findAll(pageable);
+    public PageDto<DoctorDto> find(@RequestParam(required = false) String specialization,
+                                   @ParameterObject Pageable pageable) {
+        return doctorService.find(specialization, pageable);
     }
 
     @Operation(summary = "Add doctor")

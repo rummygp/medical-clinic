@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RestController
@@ -35,14 +36,21 @@ public class AppointmentController {
             @ApiResponse(responseCode = "200", description = "Appointments page returned",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = AppointmentDto.class)))}),
+            @ApiResponse(responseCode = "404", description = "Doctor or patient not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
     public PageDto<AppointmentDto> find(@RequestParam(required = false) Long doctorId,
-                                        @RequestParam(required = false) Long patientId,
-                                        @ParameterObject Pageable pageable) {
-        return appointmentService.find(doctorId, patientId, pageable);
+                                                @RequestParam(required = false) Long patientId,
+                                                @RequestParam(required = false) String specialization,
+                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                @RequestParam(required = false) LocalDateTime startingDate,
+                                                @RequestParam(required = false) LocalDateTime endingDate,
+                                                @ParameterObject Pageable pageable) {
+        return appointmentService.find(doctorId, patientId, specialization, date, startingDate, endingDate, pageable);
     }
 
     @Operation(summary = "Add empty appointment to doctor")
@@ -90,12 +98,9 @@ public class AppointmentController {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
     }
 
-    @Operation(summary = "Get available appointments")
-    @GetMapping("/available")
-    public PageDto<AppointmentDto> getAvailable(@RequestParam(required = false) Long doctorId,
-                                                                  @RequestParam(required = false) String specialization,
-                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                                                  @ParameterObject Pageable pageable) {
-        return appointmentService.findAvailable(doctorId, specialization, date, pageable);
+    @Operation(summary = "Delete existing appointment")
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        appointmentService.delete(id);
     }
 }
