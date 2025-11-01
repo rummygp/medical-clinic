@@ -16,8 +16,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @RestController
@@ -85,5 +88,14 @@ public class AppointmentController {
     @PatchMapping("/{appointmentId}/patients/{patientId}")
     public AppointmentDto book(@PathVariable Long appointmentId, @PathVariable Long patientId) {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
+    }
+
+    @Operation(summary = "Get available appointments")
+    @GetMapping("/available")
+    public PageDto<AppointmentDto> getAvailable(@RequestParam(required = false) Long doctorId,
+                                                                  @RequestParam(required = false) String specialization,
+                                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                                  @ParameterObject Pageable pageable) {
+        return appointmentService.findAvailable(doctorId, specialization, date, pageable);
     }
 }

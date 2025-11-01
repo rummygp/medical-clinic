@@ -12,11 +12,14 @@ import com.rummgp.medical_clinic.model.Patient;
 import com.rummgp.medical_clinic.repository.AppointmentRepository;
 import com.rummgp.medical_clinic.repository.DoctorRepository;
 import com.rummgp.medical_clinic.repository.PatientRepository;
+import com.rummgp.medical_clinic.repository.specification.AppointmentSpecification;
 import com.rummgp.medical_clinic.validator.AppointmentValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +62,25 @@ public class AppointmentService {
                 .orElseThrow(() -> new NotFoundException("Patient", patientId));
         appointment.setPatient(patient);
         return appointmentRepository.save(appointment);
+    }
+
+    public PageDto<AppointmentDto> findAvailable(Long doctorId, String specialization, LocalDate date, Pageable pageable) {
+
+        Specification<Appointment> spec = AppointmentSpecification.isAvailable();
+
+        if (doctorId != null) {
+            spec = spec.and((AppointmentSpecification.hasDoctor(doctorId)));
+        }
+
+        if (specialization != null && !specialization.isEmpty()) {
+            spec = spec.and(AppointmentSpecification.hasSpecialization(specialization));
+        }
+
+        if (date != null) {
+            spec = spec.and(AppointmentSpecification.isOnDate(date));
+        }
+
+        Page<Appointment> page = appointmentRepository.findAll(spec, pageable);
+        return pageMapper.toDto(page, appointmentMapper::toDto);
     }
 }
