@@ -33,10 +33,6 @@ public class AppointmentService {
 
     public PageDto<AppointmentDto> find(Long doctorId, Long patientId, String specialization, LocalDate date,
                                                  LocalDateTime intervalStart, LocalDateTime intervalEnd, Pageable pageable) {
-        doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new NotFoundException("Doctor", doctorId));
-        patientRepository.findById(patientId)
-                .orElseThrow(() -> new NotFoundException("Patient", patientId));
         Specification<Appointment> spec = filter(doctorId, patientId, specialization, date, intervalStart, intervalEnd);
         Page<Appointment> page = appointmentRepository.findAll(spec, pageable);
         return pageMapper.toDto(page, appointmentMapper::toDto);
@@ -72,6 +68,8 @@ public class AppointmentService {
         Specification<Appointment> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
 
         if (doctorId != null) {
+            doctorRepository.findById(doctorId)
+                    .orElseThrow(() -> new NotFoundException("Doctor", doctorId));
             spec = spec.and((AppointmentSpecification.hasDoctor(doctorId)));
         }
 
@@ -88,6 +86,8 @@ public class AppointmentService {
         }
 
         if (patientId != null) {
+            patientRepository.findById(patientId)
+                    .orElseThrow(() -> new NotFoundException("Patient", patientId));
             spec = spec.and(AppointmentSpecification.hasPatient(patientId));
         } else {
             spec = spec.and(AppointmentSpecification.isAvailable());

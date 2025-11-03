@@ -46,7 +46,7 @@ public class AppointmentController {
     public PageDto<AppointmentDto> find(@RequestParam(required = false) Long doctorId,
                                                 @RequestParam(required = false) Long patientId,
                                                 @RequestParam(required = false) String specialization,
-                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                @RequestParam(required = false) LocalDate date,
                                                 @RequestParam(required = false) LocalDateTime startingDate,
                                                 @RequestParam(required = false) LocalDateTime endingDate,
                                                 @ParameterObject Pageable pageable) {
@@ -98,6 +98,7 @@ public class AppointmentController {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
     }
 
+    //todo swagger doc
     @Operation(summary = "Delete existing appointment")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {

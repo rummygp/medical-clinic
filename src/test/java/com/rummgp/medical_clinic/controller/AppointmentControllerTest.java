@@ -38,6 +38,7 @@ public class AppointmentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    //todo
 //    @Test
 //    void shouldReturnPagedAppointmentDtosWhenDataCorrect() throws Exception {
 //        Long doctorId = 1L;

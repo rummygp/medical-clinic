@@ -23,6 +23,18 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: '2306'
 
+  medical-clinic-app:
+    build: ../medical-clinic-proxy
+    container_name: 'medical-clinic-app'
+    ports:
+      - '8081:8081'
+    environment:
+      - MEDICAL_CLINIC_URL=http://app:8080
+    depends_on:
+      - app
+      - db
+
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container

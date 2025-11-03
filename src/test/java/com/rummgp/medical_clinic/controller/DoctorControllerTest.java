@@ -39,6 +39,7 @@ public class DoctorControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    //todo
 //    @Test
 //    void shouldReturnPagedDoctorDtosWhenDataCorrect() throws Exception {
 //        UserDto userDto1 = UserDto.builder().id(1L).build();

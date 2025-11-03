@@ -49,6 +49,7 @@ public class AppointmentServiceTest {
         this.appointmentService = new AppointmentService(appointmentRepository, doctorRepository, patientRepository, appointmentMapper, pageMapper);
     }
 
+    //todo
 //    @Test
 //    void find_ByDoctorAndPatientId_AppointmentReturned() {
 //        //given

@@ -47,6 +47,7 @@ public class DoctorServiceTest {
         this.doctorService = new DoctorService(doctorRepository, userRepository, institutionRepository, doctorMapper, pageMapper);
     }
 
+    //todo
 //    @Test
 //    void findAll_DataCorrect_DoctorsReturned() {
 //        // given
