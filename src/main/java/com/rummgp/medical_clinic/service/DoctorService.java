@@ -28,12 +28,7 @@ public class DoctorService {
     private final PageMapper pageMapper;
 
     public PageDto<DoctorDto> find(String specialization, Pageable pageable) {
-        Specification<Doctor> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
-
-        if (specialization != null) {
-            spec = spec.and(DoctorSpecification.hasSpecialization(specialization));
-        }
-
+        Specification<Doctor> spec = DoctorSpecification.filter(specialization);
         return pageMapper.toDto(doctorRepository.findAll(spec, pageable), doctorMapper::toDto);
     }
 

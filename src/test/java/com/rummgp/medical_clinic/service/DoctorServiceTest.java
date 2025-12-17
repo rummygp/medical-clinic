@@ -47,69 +47,71 @@ public class DoctorServiceTest {
         this.doctorService = new DoctorService(doctorRepository, userRepository, institutionRepository, doctorMapper, pageMapper);
     }
 
-    //todo
-//    @Test
-//    void findAll_DataCorrect_DoctorsReturned() {
-//        // given
-//        User user1 = User.builder()
-//                .id(1L)
-//                .email("email")
-//                .username("username")
-//                .password("password")
-//                .build();
-//        User user2 = User.builder()
-//                .id(2L)
-//                .email("email2")
-//                .username("username2")
-//                .password("password2")
-//                .build();
-//        Doctor doctor1 = Doctor.builder()
-//                .id(1L)
-//                .firstName("name1")
-//                .lastName("lastName1")
-//                .specialization("dentist")
-//                .user(user1)
-//                .institutions(new ArrayList<>())
-//                .appointments(new ArrayList<>())
-//                .build();
-//        Doctor doctor2 = Doctor.builder()
-//                .id(2L)
-//                .firstName("name2")
-//                .lastName("lastName2")
-//                .specialization("cardiologist")
-//                .user(user2)
-//                .institutions(new ArrayList<>())
-//                .appointments(new ArrayList<>())
-//                .build();
-//        List<Doctor> doctors = List.of(doctor1, doctor2);
-//        Pageable pageable = PageRequest.of(0, 2);
-//        Page<Doctor> page = new PageImpl<>(doctors, pageable, doctors.size());
-//
-//        when(doctorRepository.findAll(pageable)).thenReturn(page);
-//        //when
-//        PageDto<DoctorDto> result = doctorService.findAll(pageable);
-//        //then
-//        Assertions.assertAll(
-//                () -> assertEquals(1L, result.content().get(0).id()),
-//                () -> assertEquals("name1", result.content().get(0).firstName()),
-//                () -> assertEquals("lastName1", result.content().get(0).lastName()),
-//                () -> assertEquals("dentist", result.content().get(0).specialization()),
-//                () -> assertEquals(1L, result.content().get(0).user().id()),
-//                () -> assertEquals("email", result.content().get(0).user().email()),
-//                () -> assertEquals("username", result.content().get(0).user().username()),
-//                () -> assertTrue(result.content().get(0).institutionsId().isEmpty()),
-//                () -> assertTrue(result.content().get(0).appointmentsId().isEmpty()),
-//                () -> assertEquals(2L, result.content().get(1).id()),
-//                () -> assertEquals("name2", result.content().get(1).firstName()),
-//                () -> assertEquals("lastName2", result.content().get(1).lastName()),
-//                () -> assertEquals("cardiologist", result.content().get(1).specialization()),
-//                () -> assertEquals(2L, result.content().get(1).user().id()),
-//                () -> assertEquals("email2", result.content().get(1).user().email()),
-//                () -> assertEquals("username2", result.content().get(1).user().username()),
-//                () -> assertTrue(result.content().get(1).institutionsId().isEmpty()),
-//                () -> assertTrue(result.content().get(1).appointmentsId().isEmpty())
-//        );
-//    }
+    @Test
+    void findAll_DataCorrect_DoctorsReturned() {
+        // given
+        User user1 = User.builder()
+                .id(1L)
+                .email("email")
+                .username("username")
+                .password("password")
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .email("email2")
+                .username("username2")
+                .password("password2")
+                .build();
+        Doctor doctor1 = Doctor.builder()
+                .id(1L)
+                .firstName("name1")
+                .lastName("lastName1")
+                .specialization("dentist")
+                .user(user1)
+                .institutions(new ArrayList<>())
+                .appointments(new ArrayList<>())
+                .build();
+        Doctor doctor2 = Doctor.builder()
+                .id(2L)
+                .firstName("name2")
+                .lastName("lastName2")
+                .specialization("cardiologist")
+                .user(user2)
+                .institutions(new ArrayList<>())
+                .appointments(new ArrayList<>())
+                .build();
+        List<Doctor> doctors = List.of(doctor1, doctor2);
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<Doctor> page = new PageImpl<>(doctors, pageable, doctors.size());
+
+        when(doctorRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), eq(pageable))).thenReturn(page);
+        //when
+        PageDto<DoctorDto> result = doctorService.find(null, pageable);
+        //then
+        Assertions.assertAll(
+                () -> assertEquals(1L, result.content().get(0).id()),
+                () -> assertEquals("name1", result.content().get(0).firstName()),
+                () -> assertEquals("lastName1", result.content().get(0).lastName()),
+                () -> assertEquals("dentist", result.content().get(0).specialization()),
+                () -> assertEquals(1L, result.content().get(0).user().id()),
+                () -> assertEquals("email", result.content().get(0).user().email()),
+                () -> assertEquals("username", result.content().get(0).user().username()),
+                () -> assertTrue(result.content().get(0).institutionsId().isEmpty()),
+                () -> assertTrue(result.content().get(0).appointmentsId().isEmpty()),
+                () -> assertEquals(2L, result.content().get(1).id()),
+                () -> assertEquals("name2", result.content().get(1).firstName()),
+                () -> assertEquals("lastName2", result.content().get(1).lastName()),
+                () -> assertEquals("cardiologist", result.content().get(1).specialization()),
+                () -> assertEquals(2L, result.content().get(1).user().id()),
+                () -> assertEquals("email2", result.content().get(1).user().email()),
+                () -> assertEquals("username2", result.content().get(1).user().username()),
+                () -> assertTrue(result.content().get(1).institutionsId().isEmpty()),
+                () -> assertTrue(result.content().get(1).appointmentsId().isEmpty())
+        );
+
+        verify(doctorRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), eq(pageable));
+        verifyNoMoreInteractions(doctorRepository);
+    }
 
     @Test
     void find_DataCorrect_DoctorReturned() {

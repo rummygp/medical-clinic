@@ -16,11 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
@@ -46,11 +44,11 @@ public class AppointmentController {
     public PageDto<AppointmentDto> find(@RequestParam(required = false) Long doctorId,
                                                 @RequestParam(required = false) Long patientId,
                                                 @RequestParam(required = false) String specialization,
-                                                @RequestParam(required = false) LocalDate date,
                                                 @RequestParam(required = false) LocalDateTime startingDate,
                                                 @RequestParam(required = false) LocalDateTime endingDate,
+                                                @RequestParam(required = false) Boolean freeSlots,
                                                 @ParameterObject Pageable pageable) {
-        return appointmentService.find(doctorId, patientId, specialization, date, startingDate, endingDate, pageable);
+        return appointmentService.find(doctorId, patientId, specialization, startingDate, endingDate, freeSlots, pageable);
     }
 
     @Operation(summary = "Add empty appointment to doctor")
@@ -98,8 +96,18 @@ public class AppointmentController {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
     }
 
-    //todo swagger doc
     @Operation(summary = "Delete existing appointment")
+    @ApiResponses(value ={
+            @ApiResponse(responseCode = "204", description = "Patient has been deleted.",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Patient not found.",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))})})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         appointmentService.delete(id);

@@ -1,13 +1,15 @@
 package com.rummgp.medical_clinic.repository.specification;
 
+import com.rummgp.medical_clinic.exception.NotFoundException;
 import com.rummgp.medical_clinic.model.Appointment;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AppointmentSpecification {
 
     public static Specification<Appointment> hasSpecialization(String specialization) {
@@ -18,21 +20,10 @@ public final class AppointmentSpecification {
                 criteriaBuilder.equal(root.join("doctor").get("specialization"), specialization);
     }
 
-    public static Specification<Appointment> isOnDate(LocalDate date) {
-        if (date == null) {
+    public static Specification<Appointment> isAvailable(Boolean freeSlots) {
+        if (freeSlots == null || !freeSlots) {
             return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
         }
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDayExclusive = date.plusDays(1).atStartOfDay();
-
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.and(
-                        criteriaBuilder.lessThan(root.get("startTime"), endOfDayExclusive),
-                        criteriaBuilder.greaterThanOrEqualTo(root.get("endTime"), startOfDay)
-                );
-    }
-
-    public static Specification<Appointment> isAvailable() {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.and(
                         criteriaBuilder.isNull(root.get("patient")),
@@ -65,5 +56,32 @@ public final class AppointmentSpecification {
                         criteriaBuilder.lessThan(root.get("startTime"), intervalEnd),
                         criteriaBuilder.greaterThan(root.get("endTime"), intervalStart)
                 );
+    }
+
+    public static Specification<Appointment> filter(Long doctorId, Long patientId, String specialization,
+                                              LocalDateTime intervalStart, LocalDateTime intervalEnd, Boolean freeSlots) {
+        Specification<Appointment> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+
+        if (doctorId != null) {
+            spec = spec.and((AppointmentSpecification.hasDoctor(doctorId)));
+        }
+
+        if (specialization != null && !specialization.isEmpty()) {
+            spec = spec.and(AppointmentSpecification.hasSpecialization(specialization));
+        }
+
+        if (intervalStart != null && intervalEnd != null && intervalStart.isBefore(intervalEnd)) {
+            spec = spec.and(AppointmentSpecification.overlapsInterval(intervalStart, intervalEnd));
+        }
+
+        if (patientId != null) {
+            spec = spec.and(AppointmentSpecification.hasPatient(patientId));
+        }
+
+        if (freeSlots != null && freeSlots) {
+            spec = spec.and(AppointmentSpecification.isAvailable(freeSlots));
+        }
+
+        return spec;
     }
 }

@@ -25,7 +25,7 @@ services:
 
   medical-clinic-app:
     build: ../medical-clinic-proxy
-    container_name: 'medical-clinic-app'
+    container_name: medical-clinic-app
     ports:
       - '8081:8081'
     environment:
@@ -33,7 +33,6 @@ services:
     depends_on:
       - app
       - db
-
 
   pgadmin:
     image: dpage/pgadmin4
@@ -75,8 +74,8 @@ services:
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
     volumes:
-      - ./logstash/config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro,Z
-      - ./logstash/config/jvm.options:/usr/share/logstash/config/jvm.options:ro,Z
+      - ./logstash/config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logstash/config/jvm.options:/usr/share/logstash/config/jvm.options:ro
     ports:
       - "5050:5050"
     depends_on:

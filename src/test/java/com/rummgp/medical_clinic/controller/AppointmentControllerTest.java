@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -38,47 +37,46 @@ public class AppointmentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    //todo
-//    @Test
-//    void shouldReturnPagedAppointmentDtosWhenDataCorrect() throws Exception {
-//        Long doctorId = 1L;
-//        Long patientId = 2L;
-//        AppointmentDto appointmentDto1 = AppointmentDto.builder()
-//                .id(3L)
-//                .startTime(LocalDateTime.of(3001, 1, 11, 12, 0))
-//                .endTime(LocalDateTime.of(3001, 1, 11, 12, 15))
-//                .doctorId(1L)
-//                .patientId(2L)
-//                .build();
-//        AppointmentDto appointmentDto2 = AppointmentDto.builder()
-//                .id(4L)
-//                .startTime(LocalDateTime.of(3002, 2, 22, 13, 0))
-//                .endTime(LocalDateTime.of(3002, 2, 22, 13, 15))
-//                .doctorId(1L)
-//                .patientId(2L)
-//                .build();
-//        Pageable pageable = PageRequest.of(0, 2);
-//        PageDto<AppointmentDto> page = new PageDto<>(List.of(appointmentDto1, appointmentDto2), pageable.getPageNumber(), pageable.getPageSize(), 2, 1);
-//
-//        when(appointmentService.find(doctorId, patientId, pageable)).thenReturn(page);
-//
-//        mockMvc.perform(
-//                        MockMvcRequestBuilders.get("/appointments")
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .param("page", "0")
-//                                .param("size", "2")
-//                                .param("doctorId", "1")
-//                                .param("patientId", "2")
-//                )
-//                .andExpectAll(
-//                        status().isOk(),
-//                        jsonPath("$.content[0].id").value(3L),
-//                        jsonPath("$.content[0].startTime").value("3001-01-11T12:00:00"),
-//                        jsonPath("$.content[0].endTime").value("3001-01-11T12:15:00"),
-//                        jsonPath("$.content[0].doctorId").value(1L),
-//                        jsonPath("$.content[0].patientId").value(2L)
-//                );
-//    }
+    @Test
+    void shouldReturnPagedAppointmentDtosWhenDataCorrect() throws Exception {
+        Long doctorId = 1L;
+        Long patientId = 2L;
+        AppointmentDto appointmentDto1 = AppointmentDto.builder()
+                .id(3L)
+                .startTime(LocalDateTime.of(3001, 1, 11, 12, 0))
+                .endTime(LocalDateTime.of(3001, 1, 11, 12, 15))
+                .doctorId(1L)
+                .patientId(2L)
+                .build();
+        AppointmentDto appointmentDto2 = AppointmentDto.builder()
+                .id(4L)
+                .startTime(LocalDateTime.of(3002, 2, 22, 13, 0))
+                .endTime(LocalDateTime.of(3002, 2, 22, 13, 15))
+                .doctorId(1L)
+                .patientId(2L)
+                .build();
+        Pageable pageable = PageRequest.of(0, 2);
+        PageDto<AppointmentDto> page = new PageDto<>(List.of(appointmentDto1, appointmentDto2), pageable.getPageNumber(), pageable.getPageSize(), 2, 1);
+
+        when(appointmentService.find(doctorId, patientId, null, null, null, null, pageable)).thenReturn(page);
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/appointments")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .param("page", "0")
+                                .param("size", "2")
+                                .param("doctorId", "1")
+                                .param("patientId", "2")
+                )
+                .andExpectAll(
+                        status().isOk(),
+                        jsonPath("$.content[0].id").value(3L),
+                        jsonPath("$.content[0].startTime").value("3001-01-11T12:00:00"),
+                        jsonPath("$.content[0].endTime").value("3001-01-11T12:15:00"),
+                        jsonPath("$.content[0].doctorId").value(1L),
+                        jsonPath("$.content[0].patientId").value(2L)
+                );
+    }
 
     @Test
     void shouldSaveAndReturnAppointmentDtoWhenDataCorrect() throws Exception {
@@ -125,7 +123,7 @@ public class AppointmentControllerTest {
                 .patient(patient)
                 .build();
 
-        when(appointmentService.bookAppointment(doctor.getId(), patient.getId())).thenReturn(appointment);
+        when(appointmentService.bookAppointment(1L, 2L)).thenReturn(appointment);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/appointments/1/patients/2")
