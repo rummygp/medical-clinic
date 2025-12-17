@@ -19,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/appointments")
@@ -32,14 +34,21 @@ public class AppointmentController {
             @ApiResponse(responseCode = "200", description = "Appointments page returned",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = AppointmentDto.class)))}),
+            @ApiResponse(responseCode = "404", description = "Doctor or patient not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @GetMapping
     public PageDto<AppointmentDto> find(@RequestParam(required = false) Long doctorId,
-                                        @RequestParam(required = false) Long patientId,
-                                        @ParameterObject Pageable pageable) {
-        return appointmentService.find(doctorId, patientId, pageable);
+                                                @RequestParam(required = false) Long patientId,
+                                                @RequestParam(required = false) String specialization,
+                                                @RequestParam(required = false) LocalDateTime startingDate,
+                                                @RequestParam(required = false) LocalDateTime endingDate,
+                                                @RequestParam(required = false) Boolean freeSlots,
+                                                @ParameterObject Pageable pageable) {
+        return appointmentService.find(doctorId, patientId, specialization, startingDate, endingDate, freeSlots, pageable);
     }
 
     @Operation(summary = "Add empty appointment to doctor")
@@ -85,5 +94,22 @@ public class AppointmentController {
     @PatchMapping("/{appointmentId}/patients/{patientId}")
     public AppointmentDto book(@PathVariable Long appointmentId, @PathVariable Long patientId) {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
+    }
+
+    @Operation(summary = "Delete existing appointment")
+    @ApiResponses(value ={
+            @ApiResponse(responseCode = "204", description = "Patient has been deleted.",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Patient not found.",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))}),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorMessageDto.class))})})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        appointmentService.delete(id);
     }
 }

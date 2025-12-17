@@ -84,9 +84,9 @@ public class DoctorServiceTest {
         Pageable pageable = PageRequest.of(0, 2);
         Page<Doctor> page = new PageImpl<>(doctors, pageable, doctors.size());
 
-        when(doctorRepository.findAll(pageable)).thenReturn(page);
+        when(doctorRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), eq(pageable))).thenReturn(page);
         //when
-        PageDto<DoctorDto> result = doctorService.findAll(pageable);
+        PageDto<DoctorDto> result = doctorService.find(null, pageable);
         //then
         Assertions.assertAll(
                 () -> assertEquals(1L, result.content().get(0).id()),
@@ -108,6 +108,9 @@ public class DoctorServiceTest {
                 () -> assertTrue(result.content().get(1).institutionsId().isEmpty()),
                 () -> assertTrue(result.content().get(1).appointmentsId().isEmpty())
         );
+
+        verify(doctorRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), eq(pageable));
+        verifyNoMoreInteractions(doctorRepository);
     }
 
     @Test

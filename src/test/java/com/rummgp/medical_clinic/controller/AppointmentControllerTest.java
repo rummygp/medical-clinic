@@ -58,7 +58,7 @@ public class AppointmentControllerTest {
         Pageable pageable = PageRequest.of(0, 2);
         PageDto<AppointmentDto> page = new PageDto<>(List.of(appointmentDto1, appointmentDto2), pageable.getPageNumber(), pageable.getPageSize(), 2, 1);
 
-        when(appointmentService.find(doctorId, patientId, pageable)).thenReturn(page);
+        when(appointmentService.find(doctorId, patientId, null, null, null, null, pageable)).thenReturn(page);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/appointments")
@@ -123,7 +123,7 @@ public class AppointmentControllerTest {
                 .patient(patient)
                 .build();
 
-        when(appointmentService.bookAppointment(doctor.getId(), patient.getId())).thenReturn(appointment);
+        when(appointmentService.bookAppointment(1L, 2L)).thenReturn(appointment);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/appointments/1/patients/2")

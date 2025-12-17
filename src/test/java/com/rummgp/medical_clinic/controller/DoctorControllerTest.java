@@ -64,7 +64,7 @@ public class DoctorControllerTest {
         Pageable pageable = PageRequest.of(0, 2);
         PageDto<DoctorDto> page = new PageDto<>(List.of(doctor1, doctor2), pageable.getPageNumber(), pageable.getPageSize(), 2, 2);
 
-        when(doctorService.findAll(pageable)).thenReturn(page);
+        when(doctorService.find(null, pageable)).thenReturn(page);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/doctors")
