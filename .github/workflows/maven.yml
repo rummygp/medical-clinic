@@ -33,6 +33,11 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: medical-clinic-jar
+        path: target/medical-clinic-0.0.1-SNAPSHOT.jar
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
@@ -44,5 +49,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Upload JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+            name: medical-clinic-jar
       - name: Build docker image
         run: docker build -t egorummy/medical-clinic-app:latest .
