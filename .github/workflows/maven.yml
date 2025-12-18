@@ -53,5 +53,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
             name: medical-clinic-jar
+            path: target/
       - name: Build docker image
         run: docker build -t egorummy/medical-clinic-app:latest .
