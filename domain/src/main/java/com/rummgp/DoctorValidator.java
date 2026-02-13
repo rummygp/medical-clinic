@@ -1,6 +1,6 @@
 package com.rummgp;
 
-import com.rummgp.Exception.FieldsShouldNotBeNullException;
+import com.rummgp.exception.FieldsShouldNotBeNullException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

@@ -1,6 +1,6 @@
 package com.rummgp;
 
-import com.rummgp.Exception.NotFoundException;
+import com.rummgp.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

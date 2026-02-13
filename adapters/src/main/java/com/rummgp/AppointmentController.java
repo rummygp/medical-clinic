@@ -1,6 +1,6 @@
 package com.rummgp;
 
-import com.rummgp.Exception.ErrorMessageDto;
+import com.rummgp.exception.ErrorMessageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -79,7 +79,7 @@ public class AppointmentController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PatchMapping("/{appointmentId}/patients/{patientId}")
-    public AppointmentDto book(@PathVariable Long appointmentId, @PathVariable Long patientId) {
+    public AppointmentDto book(@PathVariable("appointmentId") Long appointmentId, @PathVariable("patientId") Long patientId) {
         return appointmentMapper.toDto(appointmentService.bookAppointment(appointmentId, patientId));
     }
 
@@ -96,7 +96,7 @@ public class AppointmentController {
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable("id") Long id) {
         appointmentService.delete(id);
     }
 }

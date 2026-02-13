@@ -1,6 +1,6 @@
 package com.rummgp;
 
-import com.rummgp.Exception.ErrorMessageDto;
+import com.rummgp.exception.ErrorMessageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -64,7 +64,7 @@ public class DoctorController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorMessageDto.class))})})
     @PutMapping("/{doctorId}/institutions/{institutionId}")
-    public DoctorDto addInstitutionToDoctor(@PathVariable Long doctorId, @PathVariable Long institutionId) {
+    public DoctorDto addInstitutionToDoctor(@PathVariable("doctorId") Long doctorId, @PathVariable("institutionId") Long institutionId) {
         return doctorMapper.toDto(doctorService.assignInstitutionToDoctor(doctorId, institutionId));
     }
 }

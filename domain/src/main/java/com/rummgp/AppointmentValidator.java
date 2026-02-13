@@ -1,9 +1,9 @@
 package com.rummgp;
 
-import com.rummgp.Exception.AppointmentBookingException;
-import com.rummgp.Exception.AppointmentExpiredException;
-import com.rummgp.Exception.AppointmentOverlapException;
-import com.rummgp.Exception.InvalidAppointmentTimeException;
+import com.rummgp.exception.AppointmentBookingException;
+import com.rummgp.exception.AppointmentExpiredException;
+import com.rummgp.exception.AppointmentOverlapException;
+import com.rummgp.exception.InvalidAppointmentTimeException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

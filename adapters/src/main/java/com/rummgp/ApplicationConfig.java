@@ -19,4 +19,20 @@ public class ApplicationConfig {
                                 InstitutionRepositoryPort institutionRepositoryPort) {
         return new DoctorService(doctorRepositoryPort, userRepositoryPort, institutionRepositoryPort);
     }
+
+    @Bean
+    PatientService patientService(PatientRepositoryPort patientRepositoryPort,
+                                  UserRepositoryPort userRepositoryPort) {
+        return new PatientService(patientRepositoryPort, userRepositoryPort);
+    }
+
+    @Bean
+    UserService userService(UserRepositoryPort userRepositoryPort) {
+        return new UserService(userRepositoryPort);
+    }
+
+    @Bean
+    InstitutionService institutionService(InstitutionRepositoryPort institutionRepositoryPort) {
+        return new InstitutionService(institutionRepositoryPort);
+    }
 }
