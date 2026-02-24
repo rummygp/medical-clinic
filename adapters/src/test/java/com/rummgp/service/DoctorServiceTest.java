@@ -1,27 +1,12 @@
-package com.rummgp.medical_clinic.service;
+package com.rummgp.service;
 
-import com.rummgp.medical_clinic.dto.DoctorDto;
-import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.exception.FieldsShouldNotBeNullException;
-import com.rummgp.medical_clinic.exception.NotFoundException;
-import com.rummgp.medical_clinic.mapper.DoctorMapper;
-import com.rummgp.medical_clinic.mapper.PageMapper;
-import com.rummgp.medical_clinic.model.Doctor;
-import com.rummgp.medical_clinic.model.Institution;
-import com.rummgp.medical_clinic.model.User;
-import com.rummgp.medical_clinic.repository.DoctorRepository;
-import com.rummgp.medical_clinic.repository.InstitutionRepository;
-import com.rummgp.medical_clinic.repository.UserRepository;
+import com.rummgp.*;
+import com.rummgp.exception.FieldsShouldNotBeNullException;
+import com.rummgp.exception.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,21 +15,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class DoctorServiceTest {
-    private DoctorRepository doctorRepository;
-    private UserRepository userRepository;
-    private InstitutionRepository institutionRepository;
-    private DoctorMapper doctorMapper;
-    private PageMapper pageMapper;
+    private DoctorRepositoryPort doctorRepositoryPort;
+    private UserRepositoryPort userRepositoryPort;
+    private InstitutionRepositoryPort institutionRepositoryPort;
     private DoctorService doctorService;
 
     @BeforeEach
     void setup() {
-        this.doctorRepository = Mockito.mock(DoctorRepository.class);
-        this.userRepository = Mockito.mock(UserRepository.class);
-        this.institutionRepository = Mockito.mock(InstitutionRepository.class);
-        this.doctorMapper = Mappers.getMapper(DoctorMapper.class);
-        this.pageMapper = Mappers.getMapper(PageMapper.class);
-        this.doctorService = new DoctorService(doctorRepository, userRepository, institutionRepository, doctorMapper, pageMapper);
+        this.doctorRepositoryPort = Mockito.mock(DoctorRepositoryPort.class);
+        this.userRepositoryPort = Mockito.mock(UserRepositoryProvider.class);
+        this.institutionRepositoryPort = Mockito.mock(InstitutionRepositoryPort.class);
+        this.doctorService = new DoctorService(doctorRepositoryPort, userRepositoryPort, institutionRepositoryPort);
     }
 
     @Test
@@ -81,36 +62,39 @@ public class DoctorServiceTest {
                 .appointments(new ArrayList<>())
                 .build();
         List<Doctor> doctors = List.of(doctor1, doctor2);
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<Doctor> page = new PageImpl<>(doctors, pageable, doctors.size());
+        DoctorFindCommand doctorFindCommand = DoctorFindCommand.builder()
+                .pageNumber(0)
+                .pageSize(20)
+                .build();
+        PagePojo<Doctor> doctorPagePojo = new PagePojo<>(doctors, 0, 20, 2L ,1);
 
-        when(doctorRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), eq(pageable))).thenReturn(page);
+        when(doctorRepositoryPort.findAll(doctorFindCommand)).thenReturn(doctorPagePojo);
         //when
-        PageDto<DoctorDto> result = doctorService.find(null, pageable);
+        PagePojo<Doctor> result = doctorService.find(doctorFindCommand);
         //then
         Assertions.assertAll(
-                () -> assertEquals(1L, result.content().get(0).id()),
-                () -> assertEquals("name1", result.content().get(0).firstName()),
-                () -> assertEquals("lastName1", result.content().get(0).lastName()),
-                () -> assertEquals("dentist", result.content().get(0).specialization()),
-                () -> assertEquals(1L, result.content().get(0).user().id()),
-                () -> assertEquals("email", result.content().get(0).user().email()),
-                () -> assertEquals("username", result.content().get(0).user().username()),
-                () -> assertTrue(result.content().get(0).institutionsId().isEmpty()),
-                () -> assertTrue(result.content().get(0).appointmentsId().isEmpty()),
-                () -> assertEquals(2L, result.content().get(1).id()),
-                () -> assertEquals("name2", result.content().get(1).firstName()),
-                () -> assertEquals("lastName2", result.content().get(1).lastName()),
-                () -> assertEquals("cardiologist", result.content().get(1).specialization()),
-                () -> assertEquals(2L, result.content().get(1).user().id()),
-                () -> assertEquals("email2", result.content().get(1).user().email()),
-                () -> assertEquals("username2", result.content().get(1).user().username()),
-                () -> assertTrue(result.content().get(1).institutionsId().isEmpty()),
-                () -> assertTrue(result.content().get(1).appointmentsId().isEmpty())
+                () -> assertEquals(1L, result.content().get(0).getId()),
+                () -> assertEquals("name1", result.content().get(0).getFirstName()),
+                () -> assertEquals("lastName1", result.content().get(0).getLastName()),
+                () -> assertEquals("dentist", result.content().get(0).getSpecialization()),
+                () -> assertEquals(1L, result.content().get(0).getUser().getId()),
+                () -> assertEquals("email", result.content().get(0).getUser().getEmail()),
+                () -> assertEquals("username", result.content().get(0).getUser().getUsername()),
+                () -> assertTrue(result.content().get(0).getInstitutions().isEmpty()),
+                () -> assertTrue(result.content().get(0).getAppointments().isEmpty()),
+                () -> assertEquals(2L, result.content().get(1).getId()),
+                () -> assertEquals("name2", result.content().get(1).getFirstName()),
+                () -> assertEquals("lastName2", result.content().get(1).getLastName()),
+                () -> assertEquals("cardiologist", result.content().get(1).getSpecialization()),
+                () -> assertEquals(2L, result.content().get(1).getUser().getId()),
+                () -> assertEquals("email2", result.content().get(1).getUser().getEmail()),
+                () -> assertEquals("username2", result.content().get(1).getUser().getUsername()),
+                () -> assertTrue(result.content().get(1).getInstitutions().isEmpty()),
+                () -> assertTrue(result.content().get(1).getAppointments().isEmpty())
         );
 
-        verify(doctorRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class), eq(pageable));
-        verifyNoMoreInteractions(doctorRepository);
+        verify(doctorRepositoryPort).findAll(doctorFindCommand);
+        verifyNoMoreInteractions(doctorRepositoryPort);
     }
 
     @Test
@@ -132,7 +116,7 @@ public class DoctorServiceTest {
                 .appointments(new ArrayList<>())
                 .build();
 
-        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+        when(doctorRepositoryPort.findById(1L)).thenReturn(Optional.of(doctor));
         //when
         Doctor result = doctorService.find(1L);
         //then
@@ -152,13 +136,13 @@ public class DoctorServiceTest {
     @Test
     void find_DoctorNotFound_ExceptionThrown() {
 
-        when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
+        when(doctorRepositoryPort.findById(1L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> doctorService.find(1L));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Doctor with id: 1 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
     }
 
@@ -182,8 +166,8 @@ public class DoctorServiceTest {
                 .appointments(new ArrayList<>())
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(doctorRepository.save(doctor)).thenReturn(doctor);
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
+        when(doctorRepositoryPort.save(doctor)).thenReturn(doctor);
         //when
         Doctor result1 = doctorService.add(doctor);
         //then
@@ -200,7 +184,7 @@ public class DoctorServiceTest {
                 () -> assertTrue(result1.getAppointments().isEmpty())
         );
 
-        verify(userRepository).findById(1L);
+        verify(userRepositoryPort).findById(1L);
     }
 
     @Test
@@ -214,13 +198,13 @@ public class DoctorServiceTest {
                 .user(user)
                 .build();
 
-        when(userRepository.findById(2L)).thenReturn(Optional.empty());
+        when(userRepositoryPort.findById(2L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> doctorService.add(doctor));
         //then
         Assertions.assertAll(
                 () -> assertEquals("User with id: 2 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
     }
 
@@ -252,7 +236,7 @@ public class DoctorServiceTest {
                 .appointments(new ArrayList<>())
                 .build();
 
-        when(doctorRepository.save(inputDoctor)).thenReturn(doctor);
+        when(doctorRepositoryPort.save(inputDoctor)).thenReturn(doctor);
         //when
         Doctor result = doctorService.add(inputDoctor);
         //then
@@ -280,7 +264,7 @@ public class DoctorServiceTest {
         //then
         Assertions.assertAll(
                 () -> assertEquals("Fields should not be null", exception.getMessage()),
-                () -> assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus())
+                () -> assertEquals(400, exception.getStatus())
         );
     }
 
@@ -289,12 +273,12 @@ public class DoctorServiceTest {
         //given
         Doctor doctor = Doctor.builder().id(1L).build();
 
-        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+        when(doctorRepositoryPort.findById(1L)).thenReturn(Optional.of(doctor));
         //when
         doctorService.delete(1L);
         //then
-        verify(doctorRepository).findById(1L);
-        verify(doctorRepository).delete(doctor);
+        verify(doctorRepositoryPort).findById(1L);
+        verify(doctorRepositoryPort).delete(doctor);
     }
 
     @Test
@@ -302,13 +286,13 @@ public class DoctorServiceTest {
         //given
         Doctor doctor = Doctor.builder().id(1L).build();
 
-        when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
+        when(doctorRepositoryPort.findById(1L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> doctorService.delete(1L));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Doctor with id: 1 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
     }
 
@@ -335,8 +319,8 @@ public class DoctorServiceTest {
                 .specialization("updatedSpecialization")
                 .build();
 
-        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
-        when(doctorRepository.save(doctor)).thenReturn(doctor);
+        when(doctorRepositoryPort.findById(1L)).thenReturn(Optional.of(doctor));
+        when(doctorRepositoryPort.save(doctor)).thenReturn(doctor);
         //when
         Doctor result = doctorService.update(1L, updatedDoctor);
         //then
@@ -377,7 +361,7 @@ public class DoctorServiceTest {
         //then
         Assertions.assertAll(
                 () -> assertEquals("Fields should not be null", exception.getMessage()),
-                () -> assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus())
+                () -> assertEquals(400, exception.getStatus())
         );
     }
 
@@ -390,13 +374,13 @@ public class DoctorServiceTest {
                 .specialization("updatedSpecialization")
                 .build();
 
-        when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
+        when(doctorRepositoryPort.findById(1L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> doctorService.update(1L, updatedDoctor));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Doctor with id: 1 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
     }
 
@@ -427,9 +411,9 @@ public class DoctorServiceTest {
                 .doctors(new ArrayList<>())
                 .build();
 
-        when(doctorRepository.findById(2L)).thenReturn(Optional.of(doctor));
-        when(institutionRepository.findById(3L)).thenReturn(Optional.of(institution));
-        when(doctorRepository.save(doctor)).thenReturn(doctor);
+        when(doctorRepositoryPort.findById(2L)).thenReturn(Optional.of(doctor));
+        when(institutionRepositoryPort.findById(3L)).thenReturn(Optional.of(institution));
+        when(doctorRepositoryPort.save(doctor)).thenReturn(doctor);
         //when
         Doctor result = doctorService.assignInstitutionToDoctor(2L, 3L);
         //then
@@ -445,9 +429,9 @@ public class DoctorServiceTest {
                 () -> assertTrue(result.getAppointments().isEmpty())
         );
 
-        verify(doctorRepository).findById(any(Long.class));
-        verify(institutionRepository).findById(any(Long.class));
-        verify(doctorRepository).save(any(Doctor.class));
+        verify(doctorRepositoryPort).findById(any(Long.class));
+        verify(institutionRepositoryPort).findById(any(Long.class));
+        verify(doctorRepositoryPort).save(any(Doctor.class));
     }
 
     @Test
@@ -456,13 +440,13 @@ public class DoctorServiceTest {
         Long doctorId = 2L;
         Long institutionId = 3L;
 
-        when(doctorRepository.findById(2L)).thenReturn(Optional.empty());
+        when(doctorRepositoryPort.findById(2L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> doctorService.assignInstitutionToDoctor(2L, 3L));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Doctor with id: 2 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
     }
 
@@ -485,16 +469,16 @@ public class DoctorServiceTest {
                 .build();
         Long institutionId = 3L;
 
-        when(doctorRepository.findById(2L)).thenReturn(Optional.of(doctor));
-        when(institutionRepository.findById(3L)).thenReturn(Optional.empty());
+        when(doctorRepositoryPort.findById(2L)).thenReturn(Optional.of(doctor));
+        when(institutionRepositoryPort.findById(3L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class, () -> doctorService.assignInstitutionToDoctor(2L, 3L));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Institution with id: 3 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
 
-        verify(doctorRepository, never()).save(any());
+        verify(doctorRepositoryPort, never()).save(any());
     }
 }

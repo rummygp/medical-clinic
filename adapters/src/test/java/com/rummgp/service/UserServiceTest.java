@@ -1,24 +1,13 @@
-package com.rummgp.medical_clinic.service;
+package com.rummgp.service;
 
-import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.dto.UserDto;
-import com.rummgp.medical_clinic.exception.FieldsShouldNotBeNullException;
-import com.rummgp.medical_clinic.exception.NotFoundException;
-import com.rummgp.medical_clinic.exception.UsernameAlreadyExistsException;
-import com.rummgp.medical_clinic.mapper.PageMapper;
-import com.rummgp.medical_clinic.mapper.UserMapper;
-import com.rummgp.medical_clinic.model.User;
-import com.rummgp.medical_clinic.repository.UserRepository;
+import com.rummgp.*;
+import com.rummgp.exception.FieldsShouldNotBeNullException;
+import com.rummgp.exception.NotFoundException;
+import com.rummgp.exception.UsernameAlreadyExistsException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,17 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
-    private UserRepository userRepository;
-    private UserMapper userMapper;
-    private PageMapper pageMapper;
+    private UserRepositoryPort userRepositoryPort;;
     private UserService userService;
 
     @BeforeEach
     void setup() {
-        this.userRepository = Mockito.mock(UserRepository.class);
-        this.userMapper = Mappers.getMapper(UserMapper.class);
-        this.pageMapper = Mappers.getMapper(PageMapper.class);
-        this.userService = new UserService(userRepository, userMapper, pageMapper);
+        this.userRepositoryPort = Mockito.mock(UserRepositoryPort.class);
+        this.userService = new UserService(userRepositoryPort);
     }
 
     @Test
@@ -55,23 +40,26 @@ public class UserServiceTest {
                 .password("userPassword2")
                 .build();
         List<User> users = List.of(user1, user2);
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<User> page = new PageImpl<>(users, pageable, users.size());
+        UserFindCommand userFindCommand = UserFindCommand.builder()
+                .pageNumber(0)
+                .pageSize(20)
+                .build();
+        PagePojo<User> usersPage = new PagePojo<>(users, 0, 20, 1L, 1);
 
-        when(userRepository.findAll(pageable)).thenReturn(page);
+        when(userRepositoryPort.findAll(userFindCommand)).thenReturn(usersPage);
         //when
-        PageDto<UserDto> result = userService.findAll(pageable);
+        PagePojo<User> result = userService.findAll(userFindCommand);
         //then
         Assertions.assertAll(
-                () -> assertEquals(1L, result.content().get(0).id()),
-                () -> assertEquals("userUsername1", result.content().get(0).username()),
-                () -> assertEquals("userEmail1", result.content().get(0).email()),
-                () -> assertEquals(2L, result.content().get(1).id()),
-                () -> assertEquals("userUsername2", result.content().get(1).username()),
-                () -> assertEquals("userEmail2", result.content().get(1).email())
+                () -> assertEquals(1L, result.content().get(0).getId()),
+                () -> assertEquals("userUsername1", result.content().get(0).getUsername()),
+                () -> assertEquals("userEmail1", result.content().get(0).getEmail()),
+                () -> assertEquals(2L, result.content().get(1).getId()),
+                () -> assertEquals("userUsername2", result.content().get(1).getUsername()),
+                () -> assertEquals("userEmail2", result.content().get(1).getEmail())
         );
 
-        verify(userRepository).findAll(pageable);
+        verify(userRepositoryPort).findAll(userFindCommand);
     }
 
     @Test
@@ -84,7 +72,7 @@ public class UserServiceTest {
                 .password("userPassword")
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
         //when
         User result = userService.find(1L);
         //then
@@ -94,7 +82,7 @@ public class UserServiceTest {
                 () -> assertEquals("userEmail", result.getEmail())
         );
 
-        verify(userRepository).findById(1L);
+        verify(userRepositoryPort).findById(1L);
     }
 
     @Test
@@ -102,16 +90,16 @@ public class UserServiceTest {
         //given
         Long userId = 1L;
 
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userRepositoryPort.findById(userId)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class, () -> userService.find(1L));
         //then
         Assertions.assertAll(
                 () -> assertEquals("User with id: 1 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
 
-        verify(userRepository).findById(userId);
+        verify(userRepositoryPort).findById(userId);
     }
 
     @Test
@@ -124,7 +112,7 @@ public class UserServiceTest {
                 .password("userPassword")
                 .build();
 
-        when(userRepository.save(user)).thenReturn(user);
+        when(userRepositoryPort.save(user)).thenReturn(user);
         //when
         User result = userService.add(user);
         //then
@@ -150,10 +138,10 @@ public class UserServiceTest {
         //then
         Assertions.assertAll(
                 () -> assertEquals("Fields should not be null", exception.getMessage()),
-                () -> assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus())
+                () -> assertEquals(400, exception.getStatus())
         );
 
-        verify(userRepository, never()).save(any());
+        verify(userRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -165,17 +153,17 @@ public class UserServiceTest {
                 .password("userPassword")
                 .build();
 
-        when(userRepository.findByUsername("existingUsername")).thenReturn(Optional.of(user));
+        when(userRepositoryPort.findByUsername("existingUsername")).thenReturn(Optional.of(user));
         //when
         UsernameAlreadyExistsException exception = Assertions.assertThrowsExactly(UsernameAlreadyExistsException.class,
                 () -> userService.add(user));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Username existingUsername is already taken", exception.getMessage()),
-                () -> assertEquals(HttpStatus.CONFLICT, exception.getHttpStatus())
+                () -> assertEquals(409, exception.getStatus())
         );
 
-        verify(userRepository, never()).save(any());
+        verify(userRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -189,8 +177,8 @@ public class UserServiceTest {
                 .password("userPassword")
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.save(user)).thenReturn(user);
+        when(userRepositoryPort.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepositoryPort.save(user)).thenReturn(user);
         //when
         User result = userService.changePassword(1L, newPassword);
         //then
@@ -201,7 +189,7 @@ public class UserServiceTest {
                 () -> assertEquals("newPassword", result.getPassword())
         );
 
-        verify(userRepository).findById(any());
+        verify(userRepositoryPort).findById(any());
     }
 
     @Test
@@ -215,11 +203,11 @@ public class UserServiceTest {
         //then
         Assertions.assertAll(
                 () -> assertEquals("Fields should not be null", exception.getMessage()),
-                () -> assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus())
+                () -> assertEquals(400, exception.getStatus())
         );
 
-        verify(userRepository, never()).findById(any());
-        verify(userRepository, never()).save(any());
+        verify(userRepositoryPort, never()).findById(any());
+        verify(userRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -228,17 +216,17 @@ public class UserServiceTest {
         String newPassword = "newPassword";
         Long userId = 1L;
 
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(userRepositoryPort.findById(userId)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class,
                 () -> userService.changePassword(userId, newPassword));
         //then
         Assertions.assertAll(
                 () -> assertEquals("User with id: 1 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
 
-        verify(userRepository).findById(any());
-        verify(userRepository, never()).save(any());
+        verify(userRepositoryPort).findById(any());
+        verify(userRepositoryPort, never()).save(any());
     }
 }

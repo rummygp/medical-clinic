@@ -1,12 +1,7 @@
-package com.rummgp.medical_clinic.controller;
+package com.rummgp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rummgp.medical_clinic.command.ChangePasswordCommand;
-import com.rummgp.medical_clinic.command.UserCreateCommand;
-import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.dto.UserDto;
-import com.rummgp.medical_clinic.model.User;
-import com.rummgp.medical_clinic.service.UserService;
+import com.rummgp.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,35 +31,30 @@ public class UserControllerTest {
 
     @Test
     void shouldReturnUserDtosWhenDataCorrect() throws Exception {
-        UserDto userDto1 = UserDto.builder()
+        User userDto1 = User.builder()
                 .id(1L)
                 .username("username1")
                 .email("email1")
                 .build();
-        UserDto userDto2 = UserDto.builder()
-                .id(2L)
-                .username("username2")
-                .email("email2")
+        UserFindCommand userFindCommand = UserFindCommand.builder()
+                .pageNumber(0)
+                .pageSize(20)
                 .build();
-        Pageable pageable = PageRequest.of(0, 2);
-        PageDto<UserDto> page = new PageDto<>(List.of(userDto1, userDto2), pageable.getPageNumber(), pageable.getPageSize(), 2, 1);
+        PagePojo<User> page = new PagePojo<>(List.of(userDto1), userFindCommand.pageNumber(), userFindCommand.pageSize(), 1, 1);
 
-        when(userService.findAll(pageable)).thenReturn(page);
+        when(userService.findAll(userFindCommand)).thenReturn(page);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("page", "0")
-                        .param("size", "2")
+                        .param("pageNumber", String.valueOf(userFindCommand.pageNumber()))
+                        .param("pageSize", String.valueOf(userFindCommand.pageSize()))
         )
                 .andExpectAll(
                         status().isOk(),
                         jsonPath("$.content[0].id").value(1),
                         jsonPath("$.content[0].username").value("username1"),
-                        jsonPath("$.content[0].email").value("email1"),
-                        jsonPath("$.content[1].id").value(2),
-                        jsonPath("$.content[1].username").value("username2"),
-                        jsonPath("$.content[1].email").value("email2")
+                        jsonPath("$.content[0].email").value("email1")
                 );
     }
 

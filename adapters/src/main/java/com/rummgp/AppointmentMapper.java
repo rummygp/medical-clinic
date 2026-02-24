@@ -37,7 +37,12 @@ public interface AppointmentMapper {
                         .firstName(doctor.getFirstName())
                         .lastName(doctor.getLastName())
                         .specialization(doctor.getSpecialization())
-                        .user(userEntityToUserPojo(doctor.getUser()))
+                        .user(User.builder()
+                                .id(doctor.getUser().getId())
+                                .username(doctor.getUser().getUsername())
+                                .email(doctor.getUser().getEmail())
+                                .password(doctor.getUser().getPassword())
+                                .build())
                         .institutions(doctor.getInstitutions().stream()
                                 .map(institution -> Institution.builder()
                                         .id(institution.getId())
@@ -58,15 +63,6 @@ public interface AppointmentMapper {
         });
         doctorOptional.ifPresent(doctor -> doctor.setAppointments(appointments));
         return doctorOptional.orElse(null);
-    };
-
-    default User userEntityToUserPojo(UserEntity user) {
-        return User.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .build();
     }
 
     @Named("doctorForDoctorEntity")
@@ -77,7 +73,12 @@ public interface AppointmentMapper {
                         .firstName(doctor1.getFirstName())
                         .lastName(doctor1.getLastName())
                         .specialization(doctor1.getSpecialization())
-                        .user(userPojoToUserEntity(doctor1.getUser()))
+                        .user(UserEntity.builder()
+                                .id(doctor1.getUser().getId())
+                                .email(doctor1.getUser().getEmail())
+                                .username(doctor1.getUser().getUsername())
+                                .password(doctor1.getUser().getPassword())
+                                .build())
                         .institutions(doctor1.getInstitutions().stream()
                                 .map(institution -> InstitutionEntity.builder()
                                         .id(institution.getId())
@@ -99,12 +100,67 @@ public interface AppointmentMapper {
         return doctorEntityOptional.orElse(null);
     }
 
-    default UserEntity userPojoToUserEntity(User user) {
-        return UserEntity.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .build();
+    default Patient patientEntityToPatient(PatientEntity patientEntity) {
+        Optional<Patient> patientOptional = Optional.ofNullable(patientEntity)
+                .map(patient -> Patient.builder()
+                        .id(patient.getId())
+                        .firstName(patient.getFirstName())
+                        .lastName(patient.getLastName())
+                        .birthday(patient.getBirthday())
+                        .idCardNo(patient.getIdCardNo())
+                        .phoneNumber(patient.getPhoneNumber())
+                        .user(User.builder()
+                                .id(patient.getUser().getId())
+                                .username(patient.getUser().getUsername())
+                                .email(patient.getUser().getEmail())
+                                .password(patient.getUser().getPassword())
+                                .build())
+                        .build());
+        List<Appointment> appointments = new ArrayList<>();
+        patientOptional.ifPresent(patient -> {
+            Optional.ofNullable(patientEntity.getAppointments()).orElse(new ArrayList<>()).stream()
+                    .map(appointment -> Appointment.builder()
+                            .id(appointment.getId())
+                            .startTime(appointment.getStartTime())
+                            .endTime(appointment.getEndTime())
+                            .patient(patient)
+                            .doctor(doctorEntityToDoctor(appointment.getDoctor()))
+                            .build())
+                    .forEach(appointments::add);
+        });
+        patientOptional.ifPresent(patient -> patient.setAppointments(appointments));
+        return patientOptional.orElse(null);
+    }
+
+    default PatientEntity patientToPatientEntity(Patient patient) {
+        Optional<PatientEntity> patientEntityOptional = Optional.ofNullable(patient)
+                .map(patient1 -> PatientEntity.builder()
+                        .id(patient1.getId())
+                        .firstName(patient1.getFirstName())
+                        .lastName(patient1.getLastName())
+                        .phoneNumber(patient1.getPhoneNumber())
+                        .birthday(patient1.getBirthday())
+                        .user(UserEntity.builder()
+                                .id(patient1.getUser().getId())
+                                .email(patient1.getUser().getEmail())
+                                .username(patient1.getUser().getUsername())
+                                .password(patient1.getUser().getPassword())
+                                .build())
+                        .idCardNo(patient1.getIdCardNo())
+                        .build());
+        List<AppointmentEntity> appointments = new ArrayList<>();
+        patientEntityOptional.ifPresent(patientEntity -> {
+            Optional.ofNullable(patient.getAppointments()).orElse(new ArrayList<>()).stream()
+                    .map(appointment -> AppointmentEntity.builder()
+                            .id(appointment.getId())
+                            .startTime(appointment.getStartTime())
+                            .endTime(appointment.getEndTime())
+                            .doctor(doctorToDoctorEntity(appointment.getDoctor()))
+                            .patient(patientEntity)
+                            .build())
+                    .forEach(appointments::add);
+        });
+        patientEntityOptional.ifPresent(patientEntity -> patientEntity.setAppointments(appointments));
+        return patientEntityOptional.orElse(null);
     }
 }

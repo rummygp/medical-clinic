@@ -1,19 +1,11 @@
-package com.rummgp.medical_clinic.controller;
+package com.rummgp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rummgp.medical_clinic.command.AppointmentCreateCommand;
-import com.rummgp.medical_clinic.dto.AppointmentDto;
-import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.model.Appointment;
-import com.rummgp.medical_clinic.model.Doctor;
-import com.rummgp.medical_clinic.model.Patient;
-import com.rummgp.medical_clinic.service.AppointmentService;
+import com.rummgp.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,34 +31,28 @@ public class AppointmentControllerTest {
 
     @Test
     void shouldReturnPagedAppointmentDtosWhenDataCorrect() throws Exception {
-        Long doctorId = 1L;
-        Long patientId = 2L;
-        AppointmentDto appointmentDto1 = AppointmentDto.builder()
+        Doctor doctor = Doctor.builder().id(1L).build();
+        Patient patient = Patient.builder().id(2L).build();
+        Appointment appointment = Appointment.builder()
                 .id(3L)
                 .startTime(LocalDateTime.of(3001, 1, 11, 12, 0))
                 .endTime(LocalDateTime.of(3001, 1, 11, 12, 15))
-                .doctorId(1L)
-                .patientId(2L)
+                .doctor(doctor)
+                .patient(patient)
                 .build();
-        AppointmentDto appointmentDto2 = AppointmentDto.builder()
-                .id(4L)
-                .startTime(LocalDateTime.of(3002, 2, 22, 13, 0))
-                .endTime(LocalDateTime.of(3002, 2, 22, 13, 15))
-                .doctorId(1L)
-                .patientId(2L)
+        AppointmentFindCommand appointmentFindCommand = AppointmentFindCommand.builder()
+                .pageNumber(0)
+                .pageSize(20)
                 .build();
-        Pageable pageable = PageRequest.of(0, 2);
-        PageDto<AppointmentDto> page = new PageDto<>(List.of(appointmentDto1, appointmentDto2), pageable.getPageNumber(), pageable.getPageSize(), 2, 1);
+        PagePojo<Appointment> appointmentPagePojo = new PagePojo<>(List.of(appointment), appointmentFindCommand.pageNumber(), appointmentFindCommand.pageSize(), 2, 1);
 
-        when(appointmentService.find(doctorId, patientId, null, null, null, null, pageable)).thenReturn(page);
+        when(appointmentService.find(appointmentFindCommand)).thenReturn(appointmentPagePojo);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/appointments")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .param("page", "0")
-                                .param("size", "2")
-                                .param("doctorId", "1")
-                                .param("patientId", "2")
+                                .param("pageNumber", String.valueOf(appointmentFindCommand.pageNumber()))
+                                .param("pageSize", String.valueOf(appointmentFindCommand.pageSize()))
                 )
                 .andExpectAll(
                         status().isOk(),

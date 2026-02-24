@@ -7,7 +7,7 @@ import org.mapstruct.Named;
 import java.util.Collections;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = AppointmentMapper.class)
 public interface PatientMapper {
 
     @Mapping(source = "appointments", target = "appointmentsId", qualifiedByName = "appointmentsToId")

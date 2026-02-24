@@ -2,7 +2,9 @@ package com.rummgp;
 
 import org.mapstruct.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Mapper(componentModel = "spring", uses = AppointmentMapper.class)
 public interface DoctorMapper {
@@ -19,6 +21,7 @@ public interface DoctorMapper {
 
     DoctorEntity toEntity(Doctor doctor);
 
+    @Mapping(source = "institutions", target = "institutions", qualifiedByName = "noLoopForInstitutions")
     Doctor toPojo(DoctorEntity doctorEntity);
 
     Doctor toPojo(DoctorCreateCommand doctorCreateCommand);
@@ -51,5 +54,25 @@ public interface DoctorMapper {
         return appointments.stream()
                 .map(Appointment::getId)
                 .toList();
+    }
+
+    @Named("noLoopForInstitutions")
+    default List<Institution> institutionMapper(List<InstitutionEntity> institutionEntities) {
+       List<Institution> institutions = new ArrayList<>();
+       Optional.ofNullable(institutionEntities).orElse(new ArrayList<>()).stream()
+               .map(institution -> Institution.builder()
+                       .id(institution.getId())
+                       .city(institution.getCity())
+                       .name(institution.getName())
+                       .street(institution.getStreet())
+                       .postalCode(institution.getPostalCode())
+                       .buildingNo(institution.getBuildingNo())
+                       .doctors(institution.getDoctors().stream()
+                               .map(doctor -> Doctor.builder()
+                                       .id(doctor.getId())
+                                       .build()).toList())
+                       .build())
+               .forEach(institutions::add);
+       return institutions;
     }
 }

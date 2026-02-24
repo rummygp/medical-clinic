@@ -1,21 +1,11 @@
-package com.rummgp.medical_clinic.controller;
+package com.rummgp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rummgp.medical_clinic.command.DoctorCreateCommand;
-import com.rummgp.medical_clinic.command.UserCreateCommand;
-import com.rummgp.medical_clinic.dto.DoctorDto;
-import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.dto.UserDto;
-import com.rummgp.medical_clinic.model.Doctor;
-import com.rummgp.medical_clinic.model.Institution;
-import com.rummgp.medical_clinic.model.User;
-import com.rummgp.medical_clinic.service.DoctorService;
+import com.rummgp.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,36 +31,39 @@ public class DoctorControllerTest {
 
     @Test
     void shouldReturnPagedDoctorDtosWhenDataCorrect() throws Exception {
-        UserDto userDto1 = UserDto.builder().id(1L).build();
-        UserDto userDto2 = UserDto.builder().id(2L).build();
-        DoctorDto doctor1 = DoctorDto.builder()
+        User user1 = User.builder().id(1L).build();
+        User user2 = User.builder().id(2L).build();
+        Doctor doctor1 = Doctor.builder()
                 .id(3L)
                 .firstName("doctorFirstName1")
                 .lastName("doctorLastName1")
                 .specialization("doctorSpecialization1")
-                .user(userDto1)
-                .institutionsId(new ArrayList<>())
-                .appointmentsId(new ArrayList<>())
+                .user(user1)
+                .institutions(new ArrayList<>())
+                .appointments(new ArrayList<>())
                 .build();
-        DoctorDto doctor2 = DoctorDto.builder()
+        Doctor doctor2 = Doctor.builder()
                 .id(4L)
                 .firstName("doctorFirstName2")
                 .lastName("doctorLastName2")
                 .specialization("doctorSpecialization2")
-                .user(userDto2)
-                .institutionsId(new ArrayList<>())
-                .appointmentsId(new ArrayList<>())
+                .user(user2)
+                .institutions(new ArrayList<>())
+                .appointments(new ArrayList<>())
                 .build();
-        Pageable pageable = PageRequest.of(0, 2);
-        PageDto<DoctorDto> page = new PageDto<>(List.of(doctor1, doctor2), pageable.getPageNumber(), pageable.getPageSize(), 2, 2);
+        DoctorFindCommand doctorFindCommand = DoctorFindCommand.builder()
+                .pageNumber(0)
+                .pageSize(20)
+                .build();
+        PagePojo<Doctor> page = new PagePojo<>(List.of(doctor1, doctor2), doctorFindCommand.pageNumber(), doctorFindCommand.pageSize(), 2, 2);
 
-        when(doctorService.find(null, pageable)).thenReturn(page);
+        when(doctorService.find(doctorFindCommand)).thenReturn(page);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/doctors")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("page", "0")
-                        .param("size", "2")
+                        .param("pageNumber", String.valueOf(doctorFindCommand.pageNumber()))
+                        .param("pageSize", String.valueOf(doctorFindCommand.pageSize()))
         )
                 .andExpectAll(
                         status().isOk(),

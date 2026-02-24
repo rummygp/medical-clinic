@@ -1,4 +1,4 @@
-package com.rummgp.medical_clinic;
+package com.rummgp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

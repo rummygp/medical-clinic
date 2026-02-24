@@ -1,23 +1,12 @@
-package com.rummgp.medical_clinic.service;
+package com.rummgp.service;
 
-import com.rummgp.medical_clinic.dto.InstitutionDto;
-import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.exception.FieldsShouldNotBeNullException;
-import com.rummgp.medical_clinic.exception.NameAlreadyExistsException;
-import com.rummgp.medical_clinic.exception.NotFoundException;
-import com.rummgp.medical_clinic.mapper.InstitutionMapper;
-import com.rummgp.medical_clinic.mapper.PageMapper;
-import com.rummgp.medical_clinic.model.Institution;
-import com.rummgp.medical_clinic.repository.InstitutionRepository;
+import com.rummgp.*;
+import com.rummgp.exception.FieldsShouldNotBeNullException;
+import com.rummgp.exception.NameAlreadyExistsException;
+import com.rummgp.exception.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,17 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class InstitutionServiceTest {
-    InstitutionRepository institutionRepository;
-    InstitutionMapper institutionMapper;
-    PageMapper pageMapper;
+    InstitutionRepositoryPort institutionRepositoryPort;
     InstitutionService institutionService;
 
     @BeforeEach()
     void setup() {
-        this.institutionRepository = mock(InstitutionRepository.class);
-        this.institutionMapper = Mappers.getMapper(InstitutionMapper.class);
-        this.pageMapper = Mappers.getMapper(PageMapper.class);
-        this.institutionService = new InstitutionService(institutionRepository, institutionMapper, pageMapper);
+        this.institutionRepositoryPort = mock(InstitutionRepositoryPort.class);
+        this.institutionService = new InstitutionService(institutionRepositoryPort);
     }
 
     @Test
@@ -63,28 +48,31 @@ public class InstitutionServiceTest {
                 .build();
 
         List<Institution> institutions = List.of(institution1, institution2);
-        Pageable pageable = PageRequest.of(0, 2);
-        Page<Institution> page = new PageImpl<>(institutions, pageable, institutions.size());
+        InstitutionFindCommand institutionFindCommand = InstitutionFindCommand.builder()
+                .pageNumber(0)
+                .pageSize(20)
+                .build();
+        PagePojo<Institution> institutionPagePojo = new PagePojo<>(institutions, 0, 20, 2L, 1);
 
-        when(institutionRepository.findAll(pageable)).thenReturn(page);
+        when(institutionRepositoryPort.findAll(institutionFindCommand)).thenReturn(institutionPagePojo);
         //when
-        PageDto<InstitutionDto> result = institutionService.findAll(pageable);
+        PagePojo<Institution> result = institutionService.findAll(institutionFindCommand);
         //then
         Assertions.assertAll(
-                () -> assertEquals(1L, result.content().get(0).id()),
-                () -> assertEquals("Institution 1", result.content().get(0).name()),
-                () -> assertEquals("City 1", result.content().get(0).city()),
-                () -> assertEquals("Postal Code 1", result.content().get(0).postalCode()),
-                () -> assertEquals("Street 1", result.content().get(0).street()),
-                () -> assertEquals("111", result.content().get(0).buildingNo()),
-                () -> assertTrue(result.content().get(0).doctorsId().isEmpty()),
-                () -> assertEquals(2L, result.content().get(1).id()),
-                () -> assertEquals("Institution 2", result.content().get(1).name()),
-                () -> assertEquals("City 2", result.content().get(1).city()),
-                () -> assertEquals("Postal Code 2", result.content().get(1).postalCode()),
-                () -> assertEquals("Street 2", result.content().get(1).street()),
-                () -> assertEquals("222", result.content().get(1).buildingNo()),
-                () -> assertTrue(result.content().get(1).doctorsId().isEmpty())
+                () -> assertEquals(1L, result.content().get(0).getId()),
+                () -> assertEquals("Institution 1", result.content().get(0).getName()),
+                () -> assertEquals("City 1", result.content().get(0).getCity()),
+                () -> assertEquals("Postal Code 1", result.content().get(0).getPostalCode()),
+                () -> assertEquals("Street 1", result.content().get(0).getStreet()),
+                () -> assertEquals("111", result.content().get(0).getBuildingNo()),
+                () -> assertTrue(result.content().get(0).getDoctors().isEmpty()),
+                () -> assertEquals(2L, result.content().get(1).getId()),
+                () -> assertEquals("Institution 2", result.content().get(1).getName()),
+                () -> assertEquals("City 2", result.content().get(1).getCity()),
+                () -> assertEquals("Postal Code 2", result.content().get(1).getPostalCode()),
+                () -> assertEquals("Street 2", result.content().get(1).getStreet()),
+                () -> assertEquals("222", result.content().get(1).getBuildingNo()),
+                () -> assertTrue(result.content().get(1).getDoctors().isEmpty())
         );
     }
 
@@ -101,7 +89,7 @@ public class InstitutionServiceTest {
                 .doctors(new ArrayList<>())
                 .build();
 
-        when(institutionRepository.findById(1L)).thenReturn(Optional.of(institution1));
+        when(institutionRepositoryPort.findById(1L)).thenReturn(Optional.of(institution1));
         //when
         Institution result = institutionService.find(1L);
         //then
@@ -120,13 +108,13 @@ public class InstitutionServiceTest {
     void find_InstitutionNotFound_ExceptionThrown() {
         Long institutionId = 1L;
 
-        when(institutionRepository.findById(1L)).thenReturn(Optional.empty());
+        when(institutionRepositoryPort.findById(1L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> institutionService.find(1L));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Institution with id: 1 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
     }
 
@@ -143,7 +131,7 @@ public class InstitutionServiceTest {
                 .doctors(new ArrayList<>())
                 .build();
 
-        when(institutionRepository.save(institution)).thenReturn(institution);
+        when(institutionRepositoryPort.save(institution)).thenReturn(institution);
         //when
         Institution result = institutionService.add(institution);
         //then
@@ -176,10 +164,10 @@ public class InstitutionServiceTest {
         //then
         Assertions.assertAll(
                 () -> assertEquals("Fields should not be null", exception.getMessage()),
-                () -> assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus())
+                () -> assertEquals(400, exception.getStatus())
         );
 
-        verify(institutionRepository, never()).save(any());
+        verify(institutionRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -194,17 +182,17 @@ public class InstitutionServiceTest {
                 .buildingNo("institutionBuildingNo")
                 .doctors(new ArrayList<>())
                 .build();
-        when(institutionRepository.findByName("existingName")).thenReturn(Optional.of(institution));
+        when(institutionRepositoryPort.findByName("existingName")).thenReturn(Optional.of(institution));
         //when
         NameAlreadyExistsException exception = Assertions.assertThrowsExactly(NameAlreadyExistsException.class,
                 () -> institutionService.add(institution));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Institution with name: existingName already exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.CONFLICT, exception.getHttpStatus())
+                () -> assertEquals(409, exception.getStatus())
         );
 
-        verify(institutionRepository, never()).save(any());
+        verify(institutionRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -212,12 +200,12 @@ public class InstitutionServiceTest {
         //given
         Institution institution = Institution.builder().id(1L).build();
 
-        when(institutionRepository.findById(1L)).thenReturn(Optional.of(institution));
+        when(institutionRepositoryPort.findById(1L)).thenReturn(Optional.of(institution));
         //when
         institutionService.delete(1L);
         //then
-        verify(institutionRepository).findById(1L);
-        verify(institutionRepository, times(1)).delete(any());
+        verify(institutionRepositoryPort).findById(1L);
+        verify(institutionRepositoryPort, times(1)).delete(any());
     }
 
     @Test
@@ -225,16 +213,16 @@ public class InstitutionServiceTest {
         //given
         Long institutionId = 3L;
 
-        when(institutionRepository.findById(3L)).thenReturn(Optional.empty());
+        when(institutionRepositoryPort.findById(3L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class, () -> institutionService.delete(3L));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Institution with id: 3 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
 
-        verify(institutionRepository, never()).delete(any());
+        verify(institutionRepositoryPort, never()).delete(any());
     }
 
     @Test
@@ -257,8 +245,8 @@ public class InstitutionServiceTest {
                 .buildingNo("updatedBuildingNo")
                 .build();
 
-        when(institutionRepository.findById(1L)).thenReturn(Optional.of(institution));
-        when(institutionRepository.save(institution)).thenReturn(institution);
+        when(institutionRepositoryPort.findById(1L)).thenReturn(Optional.of(institution));
+        when(institutionRepositoryPort.save(institution)).thenReturn(institution);
         //when
         Institution result = institutionService.update(1L, updatedInstitution);
         //then
@@ -272,7 +260,7 @@ public class InstitutionServiceTest {
                 () -> assertTrue(result.getDoctors().isEmpty())
         );
 
-        verify(institutionRepository).findById(1L);
+        verify(institutionRepositoryPort).findById(1L);
     }
 
     @Test
@@ -288,11 +276,11 @@ public class InstitutionServiceTest {
         //then
         Assertions.assertAll(
                 () -> assertEquals("Fields should not be null", exception.getMessage()),
-                () -> assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus())
+                () -> assertEquals(400, exception.getStatus())
         );
 
-        verify(institutionRepository, never()).findById(any());
-        verify(institutionRepository, never()).save(any());
+        verify(institutionRepositoryPort, never()).findById(any());
+        verify(institutionRepositoryPort, never()).save(any());
     }
 
     @Test
@@ -315,16 +303,16 @@ public class InstitutionServiceTest {
                 .buildingNo("updatedBuildingNo")
                 .build();
 
-        when(institutionRepository.findById(1L)).thenReturn(Optional.empty());
+        when(institutionRepositoryPort.findById(1L)).thenReturn(Optional.empty());
         //when
         NotFoundException exception = Assertions.assertThrowsExactly(NotFoundException.class, () -> institutionService.update(1L, updatedInstitution));
         //then
         Assertions.assertAll(
                 () -> assertEquals("Institution with id: 1 doesn't exist", exception.getMessage()),
-                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus())
+                () -> assertEquals(404, exception.getStatus())
         );
 
-        verify(institutionRepository).findById(1L);
-        verify(institutionRepository, never()).save(any());
+        verify(institutionRepositoryPort).findById(1L);
+        verify(institutionRepositoryPort, never()).save(any());
     }
 }

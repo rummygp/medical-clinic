@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 @Builder
 @Entity
+@Table(name = "institution")
 public class InstitutionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

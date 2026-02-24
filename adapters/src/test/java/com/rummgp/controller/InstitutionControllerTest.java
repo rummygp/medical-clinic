@@ -1,17 +1,11 @@
-package com.rummgp.medical_clinic.controller;
+package com.rummgp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rummgp.medical_clinic.command.InstitutionCreateCommand;
-import com.rummgp.medical_clinic.dto.InstitutionDto;
-import com.rummgp.medical_clinic.dto.PageDto;
-import com.rummgp.medical_clinic.model.Institution;
-import com.rummgp.medical_clinic.service.InstitutionService;
+import com.rummgp.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,38 +31,32 @@ public class InstitutionControllerTest {
 
     @Test
     void shouldReturnInstitutionDtosWhenDataCorrect() throws Exception {
-        InstitutionDto institutionDto1 = InstitutionDto.builder()
+        Institution institution = Institution.builder()
                 .id(1L)
                 .name("institutionName1")
                 .city("institutionCity1")
                 .postalCode("institutionPostalCode1")
                 .street("institutionStreet1")
                 .buildingNo("institutionBuildingNo1")
-                .doctorsId(new ArrayList<>())
+                .doctors(new ArrayList<>())
                 .build();
-        InstitutionDto institutionDto2 = InstitutionDto.builder()
-                .id(2L)
-                .name("institutionName2")
-                .city("institutionCity2")
-                .postalCode("institutionPostalCode2")
-                .street("institutionStreet2")
-                .buildingNo("institutionBuildingNo2")
-                .doctorsId(new ArrayList<>())
+        InstitutionFindCommand institutionFindCommand = InstitutionFindCommand.builder()
+                .pageNumber(0)
+                .pageSize(20)
                 .build();
-        Pageable pageable = PageRequest.of(0, 2);
-        PageDto<InstitutionDto> page = new PageDto<>(List.of(institutionDto1, institutionDto2), pageable.getPageNumber(), pageable.getPageSize(), 2, 1);
+        PagePojo<Institution> page = new PagePojo<>(List.of(institution), institutionFindCommand.pageNumber(), institutionFindCommand.pageSize(), 2, 1);
 
-        when(institutionService.findAll(pageable)).thenReturn(page);
+        when(institutionService.findAll(institutionFindCommand)).thenReturn(page);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/institutions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("page", "0")
-                        .param("size", "2")
+                        .param("pageNumber", String.valueOf(institutionFindCommand.pageNumber()))
+                        .param("pageSize", String.valueOf(institutionFindCommand.pageSize()))
         )
                 .andExpectAll(
                         status().isOk(),
-                        jsonPath("$.content", hasSize(2)),
+                        jsonPath("$.content", hasSize(1)),
                         jsonPath("$.content[0].id").value(1L),
                         jsonPath("$.content[0].name").value("institutionName1"),
                         jsonPath("$.content[0].city").value("institutionCity1"),
